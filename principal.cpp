@@ -3,7 +3,9 @@
 
 void Principal::loop(int size){
 	
+	//wątek oczekujący na wykonanie zlecenia
 	pthread_t principalThread;
+	//https://thispointer.com/posix-how-to-create-a-thread-pthread_create-example-tutorial/
 	//pthread_create(&principalThread,NULL,&principalMonitor,NULL);
 	//printf("%li\n", (unsigned long int) principalThread);
 	

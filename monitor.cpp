@@ -4,7 +4,7 @@
 int Monitor::rank;
 int Monitor::size;
 
-int Monitor::currentMissions = 2;
+int Monitor::currentMissions = 5;
 unsigned int Monitor::lamport = 0;
 
 pthread_mutex_t Monitor::lamportMutex = PTHREAD_MUTEX_INITIALIZER;
