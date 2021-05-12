@@ -11,9 +11,8 @@ void Principal::loop(int size){
 	packet.data = 0;
 	int orderId = 1;
 
-	sleep(5);
 	while(1){
-		//sleep(rand()%20);	
+		sleep(rand()%20);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);
 
         	pthread_mutex_lock(&Monitor::missionsMutex);
@@ -24,7 +23,7 @@ void Principal::loop(int size){
             		pthread_mutex_unlock(&Monitor::newMissionMutex);
         
         	packet.lamport = Monitor::getLamport();
-        	printf("%u: New order no. %d!\n",Monitor::getLamport() ,orderId);
+        	printf("%u: Pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,orderId);
         	for(int i = 1;i < size; i++){ // broadcast NEW_ORDER
             		if(i%3 + 1 == 1) {
                 		//sendMessage(NEW_ORDER,i);
