@@ -1,4 +1,5 @@
 #include "main.h"
+#include "monitor.h"
 
 bool thread_support = FALSE;
 
@@ -22,7 +23,18 @@ int main(int argc, char **argv){
 	
 	init(&argc,&argv);
 	if(thread_support){
-		printf("Support Granted!\n");
+		//printf("Support Granted!\n");
+		Monitor::initialize();
+		//printf("%d\n",Monitor::rank);
+
+		int type = Monitor::rank%2;
+		if(type == PRINCIPAL){
+			//principalLoop();
+			printf("Principal\n");
+		} else if(type == HUNTERS){
+			//huntersLoop();
+			printf("Hunter\n");
+		}
 	} else{
 		printf("Support Not Granted!\n");
 	}
