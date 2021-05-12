@@ -15,9 +15,6 @@
 #define TRUE 1
 #define FALSE 0
 
-#define PRINCIPAL 0
-#define HUNTERS 1
-
 /* macro debug - działa jak printf, kiedy zdefiniowano
    DEBUG, kiedy DEBUG niezdefiniowane działa jak instrukcja pusta 
    

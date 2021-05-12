@@ -1,7 +1,11 @@
 #include "main.h"
 #include "monitor.h"
+#include "principal.h"
+#include "hunters.h"
 
 bool thread_support = FALSE;
+int principal = 0;
+int hunters = 1;
 
 bool check_thread_support(int provided) {
     return provided >= MPI_THREAD_MULTIPLE;
@@ -28,11 +32,11 @@ int main(int argc, char **argv){
 		//printf("%d\n",Monitor::rank);
 
 		int type = Monitor::rank%2;
-		if(type == PRINCIPAL){
-			//principalLoop();
+		if(type == principal){
+			Principal::loop();
 			printf("Principal\n");
-		} else if(type == HUNTERS){
-			//huntersLoop();
+		} else if(type == hunters){
+			Hunters::loop();
 			printf("Hunter\n");
 		}
 	} else{
