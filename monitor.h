@@ -3,12 +3,21 @@
 #include "main.h"
 
 class Monitor {
-public:
-    static int rank;
-    static int size;
+	private:
+		static unsigned int lamport;
+		static pthread_mutex_t lamportMutex;
+	public:
+    		static int rank;
+    		static int size;
+    		static int currentMissions;
+		static pthread_mutex_t missionsMutex;
+    		static pthread_mutex_t newMissionMutex;
     
-    static void initialize();
-    static void finalize();
+    		static void initialize();
+    		static packet_t receiveMessage();
+		static void incrementLamportOnReceive(packet_t packet);
+		static unsigned int getLamport();
+    		static void finalize();
 };
 
 #endif

@@ -1,7 +1,6 @@
-#ifndef GLOBALH
-#define GLOBALH
+#ifndef MAINH
+#define MAINH
 
-#define _GNU_SOURCE
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +13,16 @@
 /* boolean */
 #define TRUE 1
 #define FALSE 0
+
+//message tags
+#define MISSION_FINISHED 119
+
+typedef struct {
+    int data;
+    int completedMissions;
+    unsigned int lamport;
+    MPI_Status status;
+} packet_t;
 
 /* macro debug - działa jak printf, kiedy zdefiniowano
    DEBUG, kiedy DEBUG niezdefiniowane działa jak instrukcja pusta 
