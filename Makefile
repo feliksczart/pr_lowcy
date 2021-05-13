@@ -1,11 +1,10 @@
 SOURCES=$(wildcard *.cpp)
 HEADERS=$(SOURCES:.cpp=.h)
-FLAGS=-DDEBUG -g
 
 all: main
 
 main: $(SOURCES) $(HEADERS) 
-	mpicc $(SOURCES) $(FLAGS) -o main
+	mpicc $(SOURCES) -o main
 
 clear: 
 	clean
