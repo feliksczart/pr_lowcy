@@ -5,9 +5,8 @@ void Principal::loop(int size, int rank){
 	
 	//wątek oczekujący na wykonanie zlecenia
 	pthread_t principalThread;
-	//https://thispointer.com/posix-how-to-create-a-thread-pthread_create-example-tutorial/
-	//pthread_create(&principalThread,NULL,&principalMonitor,NULL);
-	//printf("%li\n", (unsigned long int) principalThread);
+	pthread_create(&principalThread,NULL,&principalMonitor,NULL);
+	printf("%li\n", (unsigned long int) principalThread);
 	
 	packet_t packet;
 	packet.data = 0;
@@ -43,31 +42,26 @@ void Principal::loop(int size, int rank){
 	}	
 }
 
-//void *principalMonitor (void* x) {
-//    
-//	packet_t packet;
-//   	pthread_t handleMission;
-//    	bool end = false;
-//    	while(!end) {
-//        	packet = Monitor::receiveMessage();
-//        	if(packet.status.MPI_TAG == MISSION_FINISHED){
-//            		//pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
-//		} else {
-//            		end = true;
-//            		printf("%u: principal ends listening\n",Monitor::getLamport());
-//        	}
-//    	}
-//    	pthread_exit(NULL);
-//}
+void *principalMonitor (void* x) {
 
-//void *handleMissionFinished(void* x) {
-//    	
-//	int t = rand()%2+1;
-//    	sleep(t);
-//    	pthread_mutex_lock(&Monitor::missionsMutex);
-//    	Monitor::currentMissions+=1;
-//    	pthread_mutex_unlock(&Monitor::missionsMutex);
-//    	pthread_mutex_unlock(&Monitor::newMissionMutex);
-//    	printf("%u: X %ds\n",Monitor::getLamport(),t);
-//    	pthread_exit(NULL);
-//}
+     packet_t packet;
+     pthread_t handleMission;
+     while(1) {
+             packet = Monitor::receiveMessage();
+             if(packet.status.MPI_TAG == MISSION_FINISHED){
+                     pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
+             }
+     }
+}
+
+void *handleMissionFinished(void* x) {
+
+     int t = rand()%2+1;
+     sleep(t);
+     pthread_mutex_lock(&Monitor::missionsMutex);
+     Monitor::currentMissions-=1;
+     pthread_mutex_unlock(&Monitor::missionsMutex);
+     pthread_mutex_unlock(&Monitor::newMissionMutex);
+     printf("%u: X %ds\n",Monitor::getLamport(),t);
+     pthread_exit(NULL);
+}

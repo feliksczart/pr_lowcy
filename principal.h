@@ -2,6 +2,9 @@
 #define PRINCIPAL
 #include "main.h"
 
+void *principalMonitor (void* x);
+void *handleMissionFinished(void* x);
+
 class Principal {
 
 public:
