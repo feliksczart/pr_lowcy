@@ -12,7 +12,8 @@ void Principal::loop(int size, int rank){
 	packet_t packet;
 	packet.data = 0;
 	int orderId = 1;
-
+	
+	//wysyłanie zleceń
 	while(1){
 		sleep(rand()%40);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);

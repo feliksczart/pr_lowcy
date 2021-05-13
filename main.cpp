@@ -3,7 +3,7 @@
 #include "principal.h"
 #include "hunters.h"
 
-bool thread_support = FALSE;
+bool thread_support = false;
 int principal = 0;
 int hunters = 1;
 
@@ -12,7 +12,7 @@ bool check_thread_support(int provided) {
 }
 
 void init(int *argc, char ***argv){
-	
+
 	int provided;
 	MPI_Init_thread(argc, argv,MPI_THREAD_MULTIPLE, &provided);
 	thread_support = check_thread_support(provided);
