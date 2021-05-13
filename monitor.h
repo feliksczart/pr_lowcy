@@ -14,7 +14,8 @@ class Monitor {
 		static int currentMissions;
 		static pthread_mutex_t missionsMutex;
     		static pthread_mutex_t newMissionMutex;
-    
+    		static pthread_mutex_t waitHuntersMutex;	
+
     		static void initialize();
 		static packet_t sendMessage(int target, int tag);
     		static packet_t receiveMessage();

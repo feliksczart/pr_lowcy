@@ -12,6 +12,7 @@ unsigned int Monitor::lamport = 0;
 pthread_mutex_t Monitor::lamportMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Monitor::missionsMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Monitor::newMissionMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t Monitor::waitHuntersMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void Monitor::initialize(){
 	MPI_Comm_rank(MPI_COMM_WORLD, &Monitor::rank);

@@ -47,6 +47,7 @@ void *principalMonitor (void* x) {
      packet_t packet;
      pthread_t handleMission;
      while(1) {
+	     printf("YYYYYYYYYYY\n");
              packet = Monitor::receiveMessage();
              if(packet.status.MPI_TAG == MISSION_FINISHED){
                      pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);

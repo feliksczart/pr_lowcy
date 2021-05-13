@@ -8,6 +8,12 @@ void Hunters::loop(int size, int rank){
 	pthread_create(&incomingMissionThread,NULL,&incomingMissionMonitor,NULL);
 	//printf("%li\n", (unsigned long int) incomingMissionThread);
 	//pthread_join(incomingMissionThread,NULL);
+	while(1){
+		sleep(10);
+		pthread_mutex_lock(&Monitor::waitHuntersMutex);
+		printf("VVVVVVVVV");
+		pthread_mutex_unlock(&Monitor::waitHuntersMutex);
+	}
 }
 
 void *incomingMissionMonitor (void* x) {
