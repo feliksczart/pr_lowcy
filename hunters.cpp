@@ -9,9 +9,11 @@ void Hunters::loop(int size, int rank){
 	//printf("%li\n", (unsigned long int) incomingMissionThread);
 	//pthread_join(incomingMissionThread,NULL);
 	while(1){
-		sleep(10);
+		printf("VVVVVVVVV3\n");
+		sleep(3);	
+		printf("VVVVVVVVV2\n");
 		pthread_mutex_lock(&Monitor::waitHuntersMutex);
-		printf("VVVVVVVVV");
+		printf("VVVVVVVVV\n");
 		pthread_mutex_unlock(&Monitor::waitHuntersMutex);
 	}
 }
@@ -26,6 +28,5 @@ void *incomingMissionMonitor (void* x) {
              	if(packet.status.MPI_TAG == NEW_MISSION){
                 	printf("See mission");
             	}
-	     	sleep(2);
      	}
 }
