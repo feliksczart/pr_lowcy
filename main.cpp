@@ -34,10 +34,8 @@ int main(int argc, char **argv){
 		int type = Monitor::rank%2;
 		if(type == principal){
 			Principal::loop(Monitor::size,Monitor::rank);
-			printf("Principal\n");
 		} else if(type == hunters){
-			Hunters::loop();
-			printf("Hunter\n");
+			Hunters::loop(Monitor::size,Monitor::rank);
 		}
 	} else{
 		printf("Support Not Granted!\n");

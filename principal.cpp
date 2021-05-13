@@ -6,7 +6,7 @@ void Principal::loop(int size, int rank){
 	//wątek oczekujący na wykonanie zlecenia
 	pthread_t principalThread;
 	pthread_create(&principalThread,NULL,&principalMonitor,NULL);
-	printf("%li\n", (unsigned long int) principalThread);
+	//printf("%li\n", (unsigned long int) principalThread);
 	
 	packet_t packet;
 	packet.data = 0;
