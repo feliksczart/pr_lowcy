@@ -1,7 +1,7 @@
 #include "principal.h"
 #include "monitor.h"
 
-void Principal::loop(int size){
+void Principal::loop(int size, int rank){
 	
 	//wątek oczekujący na wykonanie zlecenia
 	pthread_t principalThread;
@@ -14,24 +14,30 @@ void Principal::loop(int size){
 	int orderId = 1;
 
 	while(1){
-		sleep(rand()%20);	
+		sleep(rand()%40);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);
 
         	pthread_mutex_lock(&Monitor::missionsMutex);
-       		Monitor::currentMissions-=1;
+       		Monitor::currentMissions+=1;
         	pthread_mutex_unlock(&Monitor::missionsMutex);
         	
-        	if(Monitor::currentMissions > 0)
+        	if(Monitor::currentMissions <= Monitor::HM){
             		pthread_mutex_unlock(&Monitor::newMissionMutex);
+		} else{
+			while(Monitor::currentMissions > Monitor::LM){
+				printf("%u: Zleceniodawca %d nie może wysłać zlecenia, bo za dużo niewykonanych!\n",Monitor::getLamport(),rank);
+				sleep(rand()%20);
+				Monitor::currentMissions-=1;
+				orderId--;
+			}
+			pthread_mutex_unlock(&Monitor::newMissionMutex);
+		} 
         
         	packet.lamport = Monitor::getLamport();
-        	printf("%u: Pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,orderId);
-        	for(int i = 1;i < size; i++){ // broadcast NEW_ORDER
-            		if(i%3 + 1 == 1) {
-                		//sendMessage(NEW_ORDER,i);
-				
-            		}
-        	}
+        	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, orderId);
+                sleep(2);
+		Monitor::sendMessage(WAIT_HUNTERS,NEW_MISSION);
+		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
         	orderId++;
 	}	
 }

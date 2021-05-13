@@ -5,7 +5,7 @@
 class Principal {
 
 public:
-	static void loop(int size);
+	static void loop(int size,int rank);
 };
 
 

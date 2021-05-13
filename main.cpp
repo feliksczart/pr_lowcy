@@ -33,7 +33,7 @@ int main(int argc, char **argv){
 
 		int type = Monitor::rank%2;
 		if(type == principal){
-			Principal::loop(Monitor::size);
+			Principal::loop(Monitor::size,Monitor::rank);
 			printf("Principal\n");
 		} else if(type == hunters){
 			Hunters::loop();

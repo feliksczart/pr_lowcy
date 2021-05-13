@@ -15,7 +15,9 @@
 #define FALSE 0
 
 //message tags
-#define MISSION_FINISHED 119
+#define NEW_MISSION 100
+#define MISSION_FINISHED 200
+#define WAIT_HUNTERS 2
 
 typedef struct {
     int data;
