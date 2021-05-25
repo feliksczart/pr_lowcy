@@ -30,22 +30,24 @@ void Monitor::sendMessage(packet_t *packet, int target, int tag) {
 	packet->lamport = Monitor::incrementLamportOnSend();
     	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
 	if (freepkt) free(packet);
-    	//return packet;
 }
 
 packet_t Monitor::receiveMessage() {
 	packet_t packet;
     	MPI_Status status;
+	printf("%d id\n",Monitor::rank);
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
     	Monitor::incrementLamportOnReceive(packet);
-   	return packet;
+   	//pthread_mutex_lock(&Monitor::newMissionMutex);
+	return packet;
 }
 
 void Monitor::listen(){
 	Monitor::listening = true;
 	packet_t packet;
 	while(Monitor::listening){
+		sleep(rand()%3+1);
 		packet = Monitor::receiveMessage();
 		printf("%d\n",packet.data);
 		pthread_mutex_lock(&Monitor::messageQMutex);

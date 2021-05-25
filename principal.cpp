@@ -40,7 +40,8 @@ void Principal::loop(int size, int rank){
 		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
         	orderId++;
 		Monitor::incrementLamportOnSend();
-	}	
+	}
+	(void) pthread_join(principalThread,NULL);	
 }
 
 void *principalMonitor (void* x) {
@@ -48,7 +49,7 @@ void *principalMonitor (void* x) {
      packet_t packet;
      pthread_t handleMission;
      while(1) {
-	     //printf("YYYYYYYYYYY\n");
+	     sleep(2);
              packet = Monitor::receiveMessage();
              if(packet.tag == MISSION_FINISHED){
                      pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
