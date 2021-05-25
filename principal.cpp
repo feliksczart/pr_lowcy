@@ -36,7 +36,12 @@ void Principal::loop(int size, int rank){
         	packet.lamport = Monitor::getLamport();
         	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, orderId);
                 sleep(2);
-		Monitor::sendMessage(&packet,WAIT_HUNTERS,NEW_MISSION);
+		int siz;
+		MPI_Comm_size(MPI_COMM_WORLD,&siz);
+		for(int i = 1; i <= siz; i+=2){	
+                	Monitor::sendMessage(&packet,i,NEW_MISSION);
+		}
+
 		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
         	orderId++;
 		Monitor::incrementLamportOnSend();
@@ -46,13 +51,20 @@ void Principal::loop(int size, int rank){
 
 void *principalMonitor (void* x) {
 
-     packet_t packet;
-     pthread_t handleMission;
-     while(1) {
-	     sleep(2);
-             packet = Monitor::receiveMessage();
-             if(packet.tag == MISSION_FINISHED){
-                     pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
+     	packet_t packet;
+     	pthread_t handleMission;
+     	while(1) {
+		//pthread_mutex_lock(&Monitor::newMissionMutex);
+		//pthread_mutex_lock(&Monitor::missionsMutex);
+
+	     	sleep(2);
+	     	printf("Siema id %d\n",Monitor::rank);
+             	packet = Monitor::receiveMessage();
+             	if(packet.tag == MISSION_FINISHED){
+                	pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
+
+		//pthread_mutex_unlock(&Monitor::newMissionMutex);
+                //pthread_mutex_unlock(&Monitor::missionsMutex);
              }
      }
 }

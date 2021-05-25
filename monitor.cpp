@@ -49,7 +49,6 @@ void Monitor::listen(){
 	while(Monitor::listening){
 		sleep(rand()%3+1);
 		packet = Monitor::receiveMessage();
-		printf("%d\n",packet.data);
 		pthread_mutex_lock(&Monitor::messageQMutex);
 		Monitor::messageQ.push(packet);
 		pthread_mutex_unlock(&Monitor::messageQMutex);
