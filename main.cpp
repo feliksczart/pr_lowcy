@@ -20,7 +20,7 @@ void init(int *argc, char ***argv){
 
 	const int nitems=3;
     	int blocklengths[3] = {1,1,1};
-    	MPI_Datatype typy[3] = {MPI_INT, MPI_INT, MPI_UNSIGNED};
+	MPI_Datatype typy[3] = {MPI_INT, MPI_INT, MPI_UNSIGNED};
 
     	MPI_Aint offsets[3];
     	offsets[0] = offsetof(packet_t, data);

@@ -36,10 +36,7 @@ void Monitor::sendMessage(packet_t *packet, int target, int tag) {
 packet_t Monitor::receiveMessage() {
 	packet_t packet;
     	MPI_Status status;
-	printf("22222222222\n");
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-    	MPI_Barrier(MPI_COMM_WORLD);
-	printf("33333333333\n");
 	packet.tag = status.MPI_TAG;
     	Monitor::incrementLamportOnReceive(packet);
    	return packet;
@@ -50,6 +47,7 @@ void Monitor::listen(){
 	packet_t packet;
 	while(Monitor::listening){
 		packet = Monitor::receiveMessage();
+		printf("%d\n",packet.data);
 		pthread_mutex_lock(&Monitor::messageQMutex);
 		Monitor::messageQ.push(packet);
 		pthread_mutex_unlock(&Monitor::messageQMutex);
