@@ -23,11 +23,14 @@ void Monitor::initialize(){
     	MPI_Comm_size(MPI_COMM_WORLD, &Monitor::size);
 }
 
-packet_t Monitor::sendMessage(int target, int tag) {
-    packet_t packet;
-    packet.lamport = Monitor::incrementLamportOnSend();
-    MPI_Send(&packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
-    return packet;
+void Monitor::sendMessage(packet_t *packet, int target, int tag) {
+    	
+	int freepkt=0;
+    	//if (packet==0) { packet = malloc(sizeof(packet_t)); freepkt=1;}
+	packet->lamport = Monitor::incrementLamportOnSend();
+    	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
+	if (freepkt) free(packet);
+    	//return packet;
 }
 
 packet_t Monitor::receiveMessage() {

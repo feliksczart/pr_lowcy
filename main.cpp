@@ -32,7 +32,8 @@ void init(int *argc, char ***argv){
 }
 
 void finalize(){
-
+	
+	MPI_Type_free(&MPI_PAKIET_T);
 	MPI_Finalize();
 }
 

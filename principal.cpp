@@ -36,7 +36,7 @@ void Principal::loop(int size, int rank){
         	packet.lamport = Monitor::getLamport();
         	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, orderId);
                 sleep(2);
-		Monitor::sendMessage(WAIT_HUNTERS,NEW_MISSION);
+		Monitor::sendMessage(&packet,WAIT_HUNTERS,NEW_MISSION);
 		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
         	orderId++;
 		Monitor::incrementLamportOnSend();

@@ -21,7 +21,7 @@ class Monitor {
 		static std::queue<packet_t> messageQ;	
 
 		static void initialize();
-		static packet_t sendMessage(int target, int tag);
+		static void sendMessage(packet_t *packet, int target, int tag);
     		static packet_t receiveMessage();
 		static unsigned int incrementLamportOnSend();
 		static void incrementLamportOnReceive(packet_t packet);
