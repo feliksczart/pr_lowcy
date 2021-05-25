@@ -26,7 +26,7 @@ void Monitor::initialize(){
 packet_t Monitor::sendMessage(int target, int tag) {
     packet_t packet;
     packet.lamport = Monitor::incrementLamportOnSend();
-    MPI_Send(&packet, sizeof(packet_t), MPI_BYTE, target, tag, MPI_COMM_WORLD);
+    MPI_Send(&packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
     return packet;
 }
 
@@ -34,10 +34,10 @@ packet_t Monitor::receiveMessage() {
 	packet_t packet;
     	MPI_Status status;
 	printf("22222222222\n");
-    	MPI_Recv( &packet, sizeof(packet_t), MPI_BYTE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
     	MPI_Barrier(MPI_COMM_WORLD);
-	printf("22222222222\n");
-	packet.status = status;
+	printf("33333333333\n");
+	packet.tag = status.MPI_TAG;
     	Monitor::incrementLamportOnReceive(packet);
    	return packet;
 }

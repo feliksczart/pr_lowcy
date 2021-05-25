@@ -18,9 +18,10 @@ using namespace std;
 
 typedef struct {
     int data;
-    int completedMissions;
+    int tag;
     unsigned int lamport;
-    MPI_Status status;
+    //MPI_Status status;
 } packet_t;
+extern MPI_Datatype MPI_PAKIET_T;
 
 #endif
