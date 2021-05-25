@@ -14,7 +14,7 @@ void Principal::loop(int size, int rank){
 	
 	//wysyłanie zleceń
 	while(1){
-		sleep(rand()%40);	
+		sleep(rand()%20);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);
 
         	pthread_mutex_lock(&Monitor::missionsMutex);
@@ -39,6 +39,7 @@ void Principal::loop(int size, int rank){
 		Monitor::sendMessage(WAIT_HUNTERS,NEW_MISSION);
 		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
         	orderId++;
+		Monitor::incrementLamportOnSend();
 	}	
 }
 
@@ -47,7 +48,7 @@ void *principalMonitor (void* x) {
      packet_t packet;
      pthread_t handleMission;
      while(1) {
-	     printf("YYYYYYYYYYY\n");
+	     //printf("YYYYYYYYYYY\n");
              packet = Monitor::receiveMessage();
              if(packet.status.MPI_TAG == MISSION_FINISHED){
                      pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);

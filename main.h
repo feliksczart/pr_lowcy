@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
+#include <queue>
+using namespace std;
 
 //message tags
 #define NEW_MISSION 100

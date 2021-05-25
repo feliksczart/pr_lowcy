@@ -2,31 +2,26 @@
 #include "monitor.h"
 
 void Hunters::loop(int size, int rank){
-
 	pthread_t incomingMissionThread;
         //https://thispointer.com/posix-how-to-create-a-thread-pthread_create-example-tutorial/
 	pthread_create(&incomingMissionThread,NULL,&incomingMissionMonitor,NULL);
 	//printf("%li\n", (unsigned long int) incomingMissionThread);
 	//pthread_join(incomingMissionThread,NULL);
 	while(1){
-		printf("VVVVVVVVV3\n");
-		sleep(3);	
-		printf("VVVVVVVVV2\n");
-		pthread_mutex_lock(&Monitor::waitHuntersMutex);
-		printf("VVVVVVVVV\n");
-		pthread_mutex_unlock(&Monitor::waitHuntersMutex);
+		sleep(2);
+		pthread_mutex_lock(&Monitor::incomingMissionMutex);
+		pthread_mutex_lock(&Monitor::messageQMutex);
+		
+		if(!Monitor::messageQ.empty()){
+			packet_t packet = Monitor::messageQ.front();
+			Monitor::messageQ.pop();
+			pthread_mutex_unlock(&Monitor::messageQMutex);
+			printf("%d CCCCCC\n",packet.data);
+		}
+
 	}
 }
 
 void *incomingMissionMonitor (void* x) {
-	
-     	packet_t packet;
-     	pthread_t handleMission;
-     	while(1) {
-		printf("Siema\n");
-             	packet = Monitor::receiveMessage();
-             	if(packet.status.MPI_TAG == NEW_MISSION){
-                	printf("See mission");
-            	}
-     	}
-}
+	Monitor::listen();
+}	
