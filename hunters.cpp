@@ -14,11 +14,10 @@ void Hunters::loop(int size, int rank){
 		if(!Monitor::messageQ.empty()){
 			packet_t packet = Monitor::messageQ.front();
 			Monitor::messageQ.pop();
-			pthread_mutex_unlock(&Monitor::messageQMutex);
 			printf("%d CCCCCC\n",packet.data);
-		} else {
-			pthread_mutex_unlock(&Monitor::messageQMutex);
 		}
+
+		pthread_mutex_unlock(&Monitor::messageQMutex);
 		pthread_mutex_unlock(&Monitor::incomingMissionMutex);
 
 	}

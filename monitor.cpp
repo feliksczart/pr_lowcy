@@ -52,7 +52,6 @@ void Monitor::listen(){
 		pthread_mutex_lock(&Monitor::messageQMutex);
 		Monitor::messageQ.push(packet);
 		pthread_mutex_unlock(&Monitor::messageQMutex);
-        	pthread_mutex_unlock(&Monitor::incomingMissionMutex);
 	}	
 }
 
