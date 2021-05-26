@@ -17,7 +17,7 @@ void Hunters::loop(int size, int rank){
 				packet_t packet = Monitor::messageQ.front();
 				Monitor::messageQ.pop();
 				packet.lamport = Monitor::getLamport();
-				printf("%d: Łowca %d otrzymał wiadomość o dostępnym zleceniu od zleceniodawcy %d\n",packet.lamport,Monitor::rank,packet.from);
+				printf("%d: Łowca %d otrzymał wiadomość o dostępnym zleceniu nr %d\n",packet.lamport,Monitor::rank,packet.orderNumber);
 				
 				Hunters::handleNewMessage(packet);
 			}
@@ -36,8 +36,10 @@ void *incomingMissionMonitor (void* x) {
 
 void Hunters::handleNewMessage(packet_t packet){
 	if(packet.tag == NEW_MISSION){
-		Hunters::state = HuntersState::TRYING_ORDER; 
-		Hunters::sendOrderReq(packet);
+		//Hunters::state = HuntersState::TRYING_ORDER;
+	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));	
+		Monitor::print_map(Monitor::missions_queues);
+		//Hunters::sendOrderReq(packet);
 	}
 }
 

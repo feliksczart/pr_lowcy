@@ -24,7 +24,7 @@ void init(int *argc, char ***argv){
     	MPI_Aint offsets[4];
     	offsets[0] = offsetof(packet_t, data);
     	offsets[1] = offsetof(packet_t, tag);
-	offsets[2] = offsetof(packet_t, from);
+	offsets[2] = offsetof(packet_t, orderNumber);
     	offsets[3] = offsetof(packet_t, lamport);
 
     	MPI_Type_create_struct(nitems, blocklengths, offsets, typy, &MPI_PAKIET_T);

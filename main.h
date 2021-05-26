@@ -9,6 +9,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <queue>
+#include <map>
 using namespace std;
 
 //message tags
@@ -20,7 +21,7 @@ using namespace std;
 typedef struct {
     int data;
     int tag;
-    int from;
+    int orderNumber;
     unsigned int lamport;
     //MPI_Status status;
 } packet_t;

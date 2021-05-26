@@ -9,7 +9,6 @@ void Principal::loop(int size, int rank){
 	
 	packet_t packet;
 	packet.data = 0;
-	packet.from = Monitor::rank;
 	int orderId = 1;
 	
 	//wysyłanie zleceń
@@ -34,10 +33,11 @@ void Principal::loop(int size, int rank){
 		} 
         
         	packet.lamport = Monitor::getLamport();
-        	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, orderId);
+		packet.orderNumber = Monitor::rank*10 + orderId;
+        	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, packet.orderNumber);
                 sleep(2);
-		Monitor::incrementLamport();	
-		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
+		Monitor::incrementLamport();
+		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, packet.orderNumber);
 		int siz;
 		MPI_Comm_size(MPI_COMM_WORLD,&siz);
 		for(int i = 0; i <= siz; i++){
