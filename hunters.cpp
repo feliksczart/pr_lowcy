@@ -37,8 +37,20 @@ void *incomingMissionMonitor (void* x) {
 void Hunters::handleNewMessage(packet_t packet){
 	if(packet.tag == NEW_MISSION){
 		//Hunters::state = HuntersState::TRYING_ORDER;
+
+		if(!Monitor::mission_q.empty()){
+			std::pair<unsigned int,int> front = Monitor::mission_q.front();
+			if(packet.lamport <= front.first && Monitor::rank < front.second){
+				Monitor::mission_q.push_front(std::make_pair(packet.lamport,Monitor::rank));
+			} else {
+			
+			}
+		} else {
+			Monitor::mission_q.push_back(std::make_pair(packet.lamport,Monitor::rank));
+		}
+		printf("Pierwszy w kolejce: %d\n",Monitor::mission_q.front().second);
 	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));	
-		Monitor::print_map(Monitor::missions_queues);
+		//Monitor::print_map(Monitor::missions_queues);
 		//Hunters::sendOrderReq(packet);
 	}
 }

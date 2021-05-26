@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <queue>
 #include <map>
+#include <deque>
 using namespace std;
 
 //message tags

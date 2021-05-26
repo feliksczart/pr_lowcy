@@ -11,9 +11,9 @@ int Monitor::currentMissions = 0;
 unsigned int Monitor::lamport = 0;
 bool Monitor::listening = false;
 std::queue<packet_t> Monitor::messageQ;
-std::queue<pair<unsigned int,int>> Monitor::mission_q;
+std::deque<pair<unsigned int,int>> Monitor::mission_q;
 std::pair<unsigned int,int> Monitor::hunter_p;
-std::map<int, queue<pair<unsigned int,int>>> Monitor::missions_queues;
+std::map<int, deque<pair<unsigned int,int>>> Monitor::missions_queues;
 
 pthread_mutex_t Monitor::lamportMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Monitor::missionsMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -73,7 +73,7 @@ unsigned int Monitor::getLamport() {
 }
 
 
-void Monitor::print_map(map<int, queue<pair<unsigned int,int>>> const &m)
+void Monitor::print_map(map<int, deque<pair<unsigned int,int>>> const &m)
 {
     for (auto const &pair: m) {
         std::cout << "{" << pair.first /*<< ": " << pair.second */<< "}\n";
