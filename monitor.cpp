@@ -1,6 +1,5 @@
 #include <algorithm>
 #include "monitor.h"
-#include <iostream>
 
 int Monitor::rank;
 int Monitor::size;

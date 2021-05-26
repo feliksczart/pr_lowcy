@@ -1,5 +1,6 @@
 #include "hunters.h"
 #include "monitor.h"
+#include <iostream>
 
 HuntersState Hunters::state = HuntersState::WAITING_ORDER;
 
@@ -17,8 +18,8 @@ void Hunters::loop(int size, int rank){
 				packet_t packet = Monitor::messageQ.front();
 				Monitor::messageQ.pop();
 				packet.lamport = Monitor::getLamport();
-				printf("%d: Łowca %d otrzymał wiadomość o dostępnym zleceniu nr %d\n",packet.lamport,Monitor::rank,packet.orderNumber);
-				
+				sleep(rand()%15+1);
+				std::cout << GREEN << packet.lamport << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
 				Hunters::handleNewMessage(packet);
 			}
 		} else if(Hunters::state == HuntersState::TRYING_ORDER){
@@ -26,8 +27,8 @@ void Hunters::loop(int size, int rank){
                                 packet_t packet = Monitor::messageQ.front();
                                 Monitor::messageQ.pop();
                                 packet.lamport = Monitor::getLamport();
-                                printf("%d: Łowca %d otrzymał request o przydzielenie zlecenia dla łowcy: %d\n",packet.lamport,Monitor::rank,packet.from);
-
+				sleep(rand()%15+1);
+                                std::cout << GREEN << packet.lamport << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia dla łowcy: " << packet.from << RESET << std::endl;
                                 Hunters::handleNewMessage(packet);
                         }
                 }
@@ -60,6 +61,10 @@ void Hunters::handleNewMessage(packet_t packet){
 		}
 	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));	
 		//Monitor::print_map(Monitor::missions_queues);
+		Monitor::incrementLamport();
+		packet.lamport = Monitor::getLamport();
+		sleep(rand()%2+1);
+		std::cout << YELLOW << packet.lamport << ": Łowca " << Monitor::rank << " pyta innych czy może wyruszyć na misję"  << RESET << std::endl;
 		Hunters::sendOrderReq(packet);
 	}
 }

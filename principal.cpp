@@ -23,7 +23,7 @@ void Principal::loop(int size, int rank){
             		pthread_mutex_unlock(&Monitor::newMissionMutex);
 		} else{
 			while(Monitor::currentMissions > Monitor::LM){
-				printf("%u: Zleceniodawca %d nie może wysłać zlecenia, bo za dużo niewykonanych!\n",Monitor::getLamport(),rank);
+				std::cout << RED << Monitor::getLamport() << ": Zleceniodawca " << rank << " nie może wysłać zlecenia, bo za dużo niewykonanych!" << RESET << std::endl;
 				sleep(rand()%20);
 				Monitor::currentMissions-=1;
 				orderId--;
@@ -33,10 +33,10 @@ void Principal::loop(int size, int rank){
         
         	packet.lamport = Monitor::getLamport();
 		packet.orderNumber = Monitor::rank*10 + orderId;
-        	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, packet.orderNumber);
+		std::cout << RED << Monitor::getLamport() << ": U zleceniodawcy " << rank << " pojawiło się zlecenie nr: " << packet.orderNumber << RESET << std::endl;
                 sleep(2);
 		Monitor::incrementLamport();
-		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, packet.orderNumber);
+		std::cout << RED << Monitor::getLamport() << ": Zleceniodawca " << rank << " wysyła zlecenie nr: " << packet.orderNumber << RESET << std::endl;
 		int siz;
 		MPI_Comm_size(MPI_COMM_WORLD,&siz);
 		for(int i = 0; i <= siz; i++){
@@ -58,7 +58,6 @@ void *principalMonitor (void* x) {
      	while(1) {
 
 	     	sleep(2);
-	     	printf("Siema id %d\n",Monitor::rank);
              	packet = Monitor::receiveMessage();
              	if(packet.tag == MISSION_FINISHED){
                 	pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
