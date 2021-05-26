@@ -22,7 +22,7 @@ void init(int *argc, char ***argv){
 	MPI_Datatype typy[4] = {MPI_INT, MPI_INT, MPI_INT, MPI_UNSIGNED};
 
     	MPI_Aint offsets[4];
-    	offsets[0] = offsetof(packet_t, data);
+    	offsets[0] = offsetof(packet_t, from);
     	offsets[1] = offsetof(packet_t, tag);
 	offsets[2] = offsetof(packet_t, orderNumber);
     	offsets[3] = offsetof(packet_t, lamport);

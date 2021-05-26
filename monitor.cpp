@@ -32,6 +32,7 @@ void Monitor::sendMessage(packet_t *packet, int target, int tag) {
 	int freepkt=0;
     	//if (packet==0) { packet = malloc(sizeof(packet_t)); freepkt=1;}
 	packet->lamport = Monitor::getLamport();
+	packet->from = Monitor::rank;
     	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
 	//if (freepkt) free(packet);
 }

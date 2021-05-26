@@ -20,7 +20,7 @@ using namespace std;
 #define WAIT_HUNTERS 2
 
 typedef struct {
-    int data;
+    int from;
     int tag;
     int orderNumber;
     unsigned int lamport;

@@ -8,7 +8,6 @@ void Principal::loop(int size, int rank){
 	pthread_create(&principalThread,NULL,&principalMonitor,NULL);
 	
 	packet_t packet;
-	packet.data = 0;
 	int orderId = 1;
 	
 	//wysyłanie zleceń
