@@ -27,7 +27,7 @@ void Monitor::sendMessage(packet_t *packet, int target, int tag) {
     	
 	int freepkt=0;
     	//if (packet==0) { packet = malloc(sizeof(packet_t)); freepkt=1;}
-	packet->lamport = Monitor::incrementLamportOnSend();
+	packet->lamport = Monitor::getLamport();
     	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
 	//if (freepkt) free(packet);
 }
@@ -52,13 +52,10 @@ void Monitor::listen(){
 		pthread_mutex_unlock(&Monitor::messageQMutex);
 	}	
 }
-
-unsigned int Monitor::incrementLamportOnSend() {
+void Monitor::incrementLamport() {
     pthread_mutex_lock(&Monitor::lamportMutex);
     Monitor::lamport += 1;
-    unsigned int newLamport = Monitor::lamport;
     pthread_mutex_unlock(&Monitor::lamportMutex);
-    return newLamport;
 }
 
 void Monitor::incrementLamportOnReceive(packet_t packet) {    

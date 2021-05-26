@@ -9,11 +9,12 @@ void Principal::loop(int size, int rank){
 	
 	packet_t packet;
 	packet.data = 0;
+	packet.from = Monitor::rank;
 	int orderId = 1;
 	
 	//wysyłanie zleceń
 	while(1){
-		sleep(rand()%20);	
+		sleep(rand()%40);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);
 
         	pthread_mutex_lock(&Monitor::missionsMutex);
@@ -35,6 +36,7 @@ void Principal::loop(int size, int rank){
         	packet.lamport = Monitor::getLamport();
         	printf("%u: U zleceniodawcy %d pojawiło się zlecenie nr: %d!\n",Monitor::getLamport() ,rank, orderId);
                 sleep(2);
+		Monitor::incrementLamport();	
 		printf("%u: Zleceniodawca %d wysyła zlecenie nr: %d do oczekujących łowców!\n",Monitor::getLamport() ,rank, orderId);
 		int siz;
 		MPI_Comm_size(MPI_COMM_WORLD,&siz);
@@ -45,7 +47,7 @@ void Principal::loop(int size, int rank){
 		}
 
         	orderId++;
-		Monitor::incrementLamportOnSend();
+		Monitor::incrementLamport();
 	}
 	pthread_join(principalThread,NULL);	
 }

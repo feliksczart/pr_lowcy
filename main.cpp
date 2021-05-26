@@ -17,14 +17,15 @@ void init(int *argc, char ***argv){
 	MPI_Init_thread(argc, argv,MPI_THREAD_MULTIPLE, &provided);
 	thread_support = check_thread_support(provided);
 
-	const int nitems=3;
-    	int blocklengths[3] = {1,1,1};
-	MPI_Datatype typy[3] = {MPI_INT, MPI_INT, MPI_UNSIGNED};
+	const int nitems=4;
+    	int blocklengths[4] = {1,1,1,1};
+	MPI_Datatype typy[4] = {MPI_INT, MPI_INT, MPI_INT, MPI_UNSIGNED};
 
-    	MPI_Aint offsets[3];
+    	MPI_Aint offsets[4];
     	offsets[0] = offsetof(packet_t, data);
     	offsets[1] = offsetof(packet_t, tag);
-    	offsets[2] = offsetof(packet_t, lamport);
+	offsets[2] = offsetof(packet_t, from);
+    	offsets[3] = offsetof(packet_t, lamport);
 
     	MPI_Type_create_struct(nitems, blocklengths, offsets, typy, &MPI_PAKIET_T);
     	MPI_Type_commit(&MPI_PAKIET_T);
