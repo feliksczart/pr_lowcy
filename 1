@@ -1,8 +1,6 @@
 #include "hunters.h"
 #include "monitor.h"
 
-HuntersState Hunters::state = HuntersState::WAITING_ORDER;
-
 void Hunters::loop(int size, int rank){
 	//wątek oczekujący na nowe zlecenia
 	pthread_t incomingMissionThread;
@@ -12,7 +10,7 @@ void Hunters::loop(int size, int rank){
 		sleep(2);
 		pthread_mutex_lock(&Monitor::incomingMissionMutex);
 		pthread_mutex_lock(&Monitor::messageQMutex);
-		if(Hunters::state == HuntersState::WAITING_ORDER){
+		if(state == HuntersState::WAITING_ORDER){
 			if(!Monitor::messageQ.empty()){
 				packet_t packet = Monitor::messageQ.front();
 				Monitor::messageQ.pop();
@@ -36,7 +34,7 @@ void *incomingMissionMonitor (void* x) {
 
 void Hunters::handleNewMessage(packet_t packet){
 	if(packet.tag == NEW_MISSION){
-		Hunters::state = HuntersState::TRYING_ORDER; 
+		state = HuntersState::TRYING_ORDER; 
 		Hunters::sendOrderReq(packet);
 	}
 }

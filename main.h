@@ -13,6 +13,7 @@ using namespace std;
 
 //message tags
 #define NEW_MISSION 100
+#define ORDER_REQ 101
 #define MISSION_FINISHED 200
 #define WAIT_HUNTERS 2
 
