@@ -5,7 +5,6 @@
 
 bool thread_support = false;
 int principal = 0;
-int hunters = 1;
 MPI_Datatype MPI_PAKIET_T;
 
 bool check_thread_support(int provided) {
@@ -43,12 +42,11 @@ int main(int argc, char **argv){
 	if(thread_support){
 		//printf("Support Granted!\n");
 		Monitor::initialize();
-		//printf("%d\n",Monitor::rank);
 
-		int type = Monitor::rank%2;
+		int type = Monitor::rank%4;
 		if(type == principal){
 			Principal::loop(Monitor::size,Monitor::rank);
-		} else if(type == hunters){
+		} else {
 			Hunters::loop(Monitor::size,Monitor::rank);
 		}
 	} else{

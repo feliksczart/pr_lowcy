@@ -29,17 +29,15 @@ void Monitor::sendMessage(packet_t *packet, int target, int tag) {
     	//if (packet==0) { packet = malloc(sizeof(packet_t)); freepkt=1;}
 	packet->lamport = Monitor::incrementLamportOnSend();
     	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
-	if (freepkt) free(packet);
+	//if (freepkt) free(packet);
 }
 
 packet_t Monitor::receiveMessage() {
 	packet_t packet;
     	MPI_Status status;
-	printf("%d id\n",Monitor::rank);
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
     	Monitor::incrementLamportOnReceive(packet);
-   	//pthread_mutex_lock(&Monitor::newMissionMutex);
 	return packet;
 }
 

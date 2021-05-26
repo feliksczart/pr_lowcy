@@ -19,6 +19,7 @@ using namespace std;
 typedef struct {
     int data;
     int tag;
+    int from;
     unsigned int lamport;
     //MPI_Status status;
 } packet_t;
