@@ -8,6 +8,8 @@ int Monitor::HM = 5;
 int Monitor::LM = 3;
 int Monitor::currentMissions = 0;
 unsigned int Monitor::lamport = 0;
+unsigned int Monitor::newMissionTimestamp;
+unsigned int Monitor::incomingMissReqTimestamp;
 bool Monitor::listening = false;
 std::queue<packet_t> Monitor::messageQ;
 std::deque<pair<unsigned int,int>> Monitor::mission_q;
@@ -30,7 +32,17 @@ void Monitor::sendMessage(packet_t *packet, int target, int tag) {
     	
 	int freepkt=0;
     	//if (packet==0) { packet = malloc(sizeof(packet_t)); freepkt=1;}
-	packet->lamport = Monitor::getLamport();
+	if(packet->tag == ORDER_REQ){
+		auto x = Monitor::missions_queues.find(packet->orderNumber);
+		for (int i=0; i<x->second.size(); i++) {
+                	if(x->second.at(i).second == Monitor::rank){
+				packet->lamport = x->second.at(i).first;
+			}
+                }
+	}else{
+		packet->lamport = Monitor::getLamport();
+	}
+	//std::cout << BLUE << packet->lamport << " id: " << Monitor::rank << RESET << std::endl;
 	packet->from = Monitor::rank;
     	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
 	//if (freepkt) free(packet);
@@ -41,7 +53,13 @@ packet_t Monitor::receiveMessage() {
     	MPI_Status status;
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
+	if(packet.tag == ORDER_REQ){
+		Monitor::incomingMissReqTimestamp = packet.lamport;
+	}
     	Monitor::incrementLamportOnReceive(packet);
+	if (packet.tag == NEW_MISSION){
+		Monitor::newMissionTimestamp = Monitor::getLamport();
+	}
 	return packet;
 }
 
