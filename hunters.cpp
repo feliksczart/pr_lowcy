@@ -19,9 +19,9 @@ void Hunters::loop(int size, int rank){
 			packet.lamport = Monitor::getLamport();
 			if(Hunters::state == HuntersState::WAITING_ORDER){
 				sleep(rand()%15+1);
-				std::cout << GREEN << packet.lamport << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
+				std::cout << GREEN << Monitor::getLamport() << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
 			} else if(Hunters::state == HuntersState::TRYING_ORDER){
-				std::cout << GREEN << packet.lamport << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia " << packet.orderNumber << " dla łowcy " << packet.from << RESET << std::endl;	
+				std::cout << GREEN << Monitor::getLamport() << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia " << packet.orderNumber << " dla łowcy " << packet.from << RESET << std::endl;	
 			}
 			Hunters::handleNewMessage(packet);
 		}
@@ -40,36 +40,29 @@ void *incomingMissionMonitor (void* x) {
 void Hunters::handleNewMessage(packet_t packet){
 	if(packet.tag == NEW_MISSION){
 		Hunters::state = HuntersState::TRYING_ORDER;
-
-		if(!Monitor::mission_q.empty()){
-			std::pair<unsigned int,int> front = Monitor::mission_q.front();
-			if(packet.lamport <= front.first && Monitor::rank < front.second){
-				Monitor::mission_q.push_front(std::make_pair(packet.lamport,Monitor::rank));
-			} else {
-			
-			}
-		} else {
-			Monitor::mission_q.push_back(std::make_pair(packet.lamport,Monitor::rank));
-		}
+		
+		Monitor::mission_q.push_back(std::make_pair(packet.lamport,Monitor::rank));
 	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));	
 		//Monitor::print_map(Monitor::missions_queues);
-		Monitor::incrementLamport();
 		packet.lamport = Monitor::getLamport();
 		//sleep(rand()%2+1);
-		std::cout << YELLOW << packet.lamport << ": Łowca " << Monitor::rank << " pyta innych czy może wyruszyć na misję"  << RESET << std::endl;
+		std::cout << YELLOW << packet.lamport+1 << ": Łowca " << Monitor::rank << " pyta innych czy może wyruszyć na misję"  << RESET << std::endl;
 		Hunters::sendOrderReq(packet);
 	} else if(packet.tag == ORDER_REQ){
 		auto firstInQueue = Monitor::missions_queues.find(packet.orderNumber);
+		//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.size() << RESET << std::endl;
 		if(packet.lamport > firstInQueue->second.at(0).first){
-			//send you cant
+			Monitor::missions_queues.find(packet.orderNumber)->second.push_back(std::make_pair(packet.lamport,packet.from));
 		} else if(packet.lamport < firstInQueue->second.at(0).first){
-			//update kolejki
-			//wysłanie do tego co był, że nie może
+			Monitor::missions_queues.find(packet.orderNumber)->second.push_front(std::make_pair(packet.lamport,packet.from));
 		} else if(packet.from > firstInQueue->second.at(0).first){
-			//send you cant
+			Monitor::missions_queues.find(packet.orderNumber)->second.push_back(std::make_pair(packet.lamport,packet.from));
 		} else if(packet.from < firstInQueue->second.at(0).first){
-			//update kolejki
-                        //wysłanie do tego co był, że nie może
+			Monitor::missions_queues.find(packet.orderNumber)->second.push_front(std::make_pair(packet.lamport,packet.from));
+		}
+		//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.size() << RESET << std::endl;
+		if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT){
+			std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second << RESET << std::endl;	
 		}
 	}
 }
@@ -82,4 +75,5 @@ void Hunters::sendOrderReq(packet_t packet){
                 	Monitor::sendMessage(&packet,i,ORDER_REQ);
                 }
 	}
+	Monitor::incrementLamport();
 }

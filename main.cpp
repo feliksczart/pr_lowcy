@@ -6,6 +6,7 @@
 bool thread_support = false;
 int principal = 0;
 MPI_Datatype MPI_PAKIET_T;
+int HUNTERS_COUNT = 0;
 
 bool check_thread_support(int provided) {
     return provided >= MPI_THREAD_MULTIPLE;
@@ -37,12 +38,24 @@ void finalize(){
 	MPI_Finalize();
 }
 
+void countHunters(){
+	int siz;
+        MPI_Comm_size(MPI_COMM_WORLD,&siz);
+        for(int i = 0; i <= siz; i++){
+        	if(i%4!=0){
+                	HUNTERS_COUNT++;	
+        	}
+        }
+}
+
 int main(int argc, char **argv){
 	
 	init(&argc,&argv);
 	if(thread_support){
 		//printf("Support Granted!\n");
 		Monitor::initialize();
+		
+		countHunters();
 
 		int type = Monitor::rank%4;
 		if(type == principal){

@@ -20,6 +20,7 @@ using namespace std;
 #define MISSION_FINISHED 200
 #define WAIT_HUNTERS 2
 
+extern int HUNTERS_COUNT;
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
