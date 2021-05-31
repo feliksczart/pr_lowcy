@@ -30,22 +30,8 @@ void Monitor::initialize(){
 
 void Monitor::sendMessage(packet_t *packet, int target, int tag) {
     	
-	int freepkt=0;
-    	//if (packet==0) { packet = malloc(sizeof(packet_t)); freepkt=1;}
-	if(packet->tag == ORDER_REQ){
-		auto x = Monitor::missions_queues.find(packet->orderNumber);
-		for (int i=0; i<x->second.size(); i++) {
-                	if(x->second.at(i).second == Monitor::rank){
-				packet->lamport = x->second.at(i).first;
-			}
-                }
-	}else{
-		packet->lamport = Monitor::getLamport();
-	}
 	//std::cout << BLUE << packet->lamport << " id: " << Monitor::rank << RESET << std::endl;
-	packet->from = Monitor::rank;
     	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
-	//if (freepkt) free(packet);
 }
 
 packet_t Monitor::receiveMessage() {

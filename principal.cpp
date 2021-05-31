@@ -39,6 +39,9 @@ void Principal::loop(int size, int rank){
 		std::cout << RED << Monitor::getLamport() << ": Zleceniodawca " << rank << " wysyła zlecenie nr: " << packet.orderNumber << RESET << std::endl;
 		int siz;
 		MPI_Comm_size(MPI_COMM_WORLD,&siz);
+                
+		packet.lamport = Monitor::getLamport();
+        	packet.from = Monitor::rank;
 		for(int i = 0; i <= siz; i++){
 			if(i%4!=0){	
                 		Monitor::sendMessage(&packet,i,NEW_MISSION);
