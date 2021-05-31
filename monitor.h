@@ -12,8 +12,6 @@ class Monitor {
     		static int size;
     		static int HM;
 		static int LM;
-		static unsigned int newMissionTimestamp;
-		static unsigned int incomingMissReqTimestamp;
 		static int currentMissions;
 		static pthread_mutex_t missionsMutex;
     		static pthread_mutex_t newMissionMutex;

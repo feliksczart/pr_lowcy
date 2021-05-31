@@ -59,7 +59,8 @@ void Hunters::handleNewMessage(packet_t packet){
 			Monitor::missions_queues.find(packet.orderNumber)->second.push_front(std::make_pair(packet.lamport,packet.from));
 		}
 		//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.size() << RESET << std::endl;
-		if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT){
+		//if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT){
+		if(Monitor::rank == 7){	
 			cout << packet.orderNumber << ": ";
 			for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
         			cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';

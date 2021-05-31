@@ -8,8 +8,6 @@ int Monitor::HM = 5;
 int Monitor::LM = 3;
 int Monitor::currentMissions = 0;
 unsigned int Monitor::lamport = 0;
-unsigned int Monitor::newMissionTimestamp;
-unsigned int Monitor::incomingMissReqTimestamp;
 bool Monitor::listening = false;
 std::queue<packet_t> Monitor::messageQ;
 std::deque<pair<unsigned int,int>> Monitor::mission_q;
@@ -39,13 +37,7 @@ packet_t Monitor::receiveMessage() {
     	MPI_Status status;
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
-	if(packet.tag == ORDER_REQ){
-		Monitor::incomingMissReqTimestamp = packet.lamport;
-	}
     	Monitor::incrementLamportOnReceive(packet);
-	if (packet.tag == NEW_MISSION){
-		Monitor::newMissionTimestamp = Monitor::getLamport();
-	}
 	return packet;
 }
 
