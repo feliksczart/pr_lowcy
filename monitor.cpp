@@ -9,6 +9,8 @@ int Monitor::LM = 3;
 int Monitor::currentMissions = 0;
 unsigned int Monitor::lamport = 0;
 bool Monitor::listening = false;
+int Monitor::ackCount = 0;
+
 std::queue<packet_t> Monitor::messageQ;
 std::deque<pair<unsigned int,int>> Monitor::mission_q;
 std::pair<unsigned int,int> Monitor::hunter_p;
@@ -37,6 +39,9 @@ packet_t Monitor::receiveMessage() {
     	MPI_Status status;
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
+	if(packet.tag == YOU_CAN_GO){
+		std::cout << GREEN << "Siema" << RESET << std::endl;
+	}
     	Monitor::incrementLamportOnReceive(packet);
 	return packet;
 }
@@ -68,6 +73,12 @@ unsigned int Monitor::getLamport() {
     return Monitor::lamport;
 }
 
+void Monitor::deleteQueue(int orderNum){
+	auto orderQueue = Monitor::missions_queues.find(orderNum);
+	pthread_mutex_lock(&Monitor::messageQMutex);
+	Monitor::missions_queues.erase(orderQueue);
+	pthread_mutex_unlock(&Monitor::messageQMutex);	
+}
 
 void Monitor::print_map(map<int, deque<pair<unsigned int,int>>> const &m)
 {

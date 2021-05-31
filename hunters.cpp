@@ -59,13 +59,15 @@ void Hunters::handleNewMessage(packet_t packet){
 			Monitor::missions_queues.find(packet.orderNumber)->second.push_front(std::make_pair(packet.lamport,packet.from));
 		}
 		//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.size() << RESET << std::endl;
-		//if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT){
-		if(Monitor::rank == 7){	
-			cout << packet.orderNumber << ": ";
-			for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
-        			cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';
-    			}
-			std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second << RESET << std::endl;	
+		if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT){
+		//if(Monitor::rank == 7){	
+			//cout << packet.orderNumber << ": ";
+			//for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
+        			//cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';
+    			//}
+			std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second << RESET << std::endl;
+			Hunters::sendAckToWinner(packet);
+			Monitor::deleteQueue(packet.orderNumber);
 		}
 	}
 }
@@ -91,4 +93,12 @@ int Hunters::getMyLamportInQueue(int orderNum){
 		}
 	}
 	return 0;
+}
+
+void Hunters::sendAckToWinner(packet_t packet){
+	packet.lamport = Monitor::getLamport();
+	int winner = Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second;
+	if(Monitor::rank != winner)
+		Monitor::sendMessage(&packet,winner,YOU_CAN_GO);
+	Monitor::incrementLamport();	
 }

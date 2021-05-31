@@ -12,6 +12,7 @@ class Monitor {
     		static int size;
     		static int HM;
 		static int LM;
+		static int ackCount;
 		static int currentMissions;
 		static pthread_mutex_t missionsMutex;
     		static pthread_mutex_t newMissionMutex;
@@ -31,6 +32,7 @@ class Monitor {
 		static void incrementLamportOnReceive(packet_t packet);
 		static unsigned int getLamport();
     		static void listen();
+		static void deleteQueue(int orderNum);
 		static void finalize();
 
 		static void print_map(map<int, deque<pair<unsigned int,int>>> const &m);
