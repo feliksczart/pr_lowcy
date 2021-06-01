@@ -12,6 +12,7 @@
 #include <map>
 #include <deque>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 //message tags

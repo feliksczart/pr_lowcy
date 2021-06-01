@@ -20,6 +20,7 @@ class Monitor {
 		static pthread_mutex_t messageQMutex;
 		static pthread_mutex_t incomingMissionMutex;
 		static std::queue<packet_t> messageQ;
+		static std::deque<int> onMission;
 		//queue trzymający id i zegar lamporta łowcy	
 		static std::deque<pair<unsigned int,int>> mission_q;
 		static std::pair<unsigned int, int> hunter_p;
@@ -33,6 +34,7 @@ class Monitor {
 		static unsigned int getLamport();
     		static void listen();
 		static void deleteQueue(int orderNum);
+		static bool myComparison(const pair<unsigned int,int> &a,const pair<unsigned int,int> &b);
 		static void finalize();
 
 		static void print_map(map<int, deque<pair<unsigned int,int>>> const &m);

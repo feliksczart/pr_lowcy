@@ -15,6 +15,7 @@ std::queue<packet_t> Monitor::messageQ;
 std::deque<pair<unsigned int,int>> Monitor::mission_q;
 std::pair<unsigned int,int> Monitor::hunter_p;
 std::map<int, deque<pair<unsigned int,int>>> Monitor::missions_queues;
+std::deque<int> Monitor::onMission;
 
 pthread_mutex_t Monitor::lamportMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Monitor::missionsMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -50,7 +51,6 @@ void Monitor::listen(){
 	Monitor::listening = true;
 	packet_t packet;
 	while(Monitor::listening){
-		sleep(rand()%3+1);
 		packet = Monitor::receiveMessage();
 		pthread_mutex_lock(&Monitor::messageQMutex);
 		Monitor::messageQ.push(packet);
@@ -75,9 +75,20 @@ unsigned int Monitor::getLamport() {
 
 void Monitor::deleteQueue(int orderNum){
 	auto orderQueue = Monitor::missions_queues.find(orderNum);
-	pthread_mutex_lock(&Monitor::messageQMutex);
+	//pthread_mutex_lock(&Monitor::messageQMutex);
 	Monitor::missions_queues.erase(orderQueue);
-	pthread_mutex_unlock(&Monitor::messageQMutex);	
+	//pthread_mutex_unlock(&Monitor::messageQMutex);	
+}
+
+bool Monitor::myComparison(const pair<unsigned int,int> &a,const pair<unsigned int,int> &b){
+	if(a.first < b.first)
+		return true;
+	if(a.first > b.first)
+		return false;
+	if(a.second < b.second)
+		return true;
+	if(a.second > b.second)
+                return false;
 }
 
 void Monitor::print_map(map<int, deque<pair<unsigned int,int>>> const &m)
