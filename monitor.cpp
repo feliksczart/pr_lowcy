@@ -40,9 +40,6 @@ packet_t Monitor::receiveMessage() {
     	MPI_Status status;
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
-	if(packet.tag == YOU_CAN_GO){
-		std::cout << GREEN << "Siema" << RESET << std::endl;
-	}
     	Monitor::incrementLamportOnReceive(packet);
 	return packet;
 }
@@ -97,5 +94,3 @@ void Monitor::print_map(map<int, deque<pair<unsigned int,int>>> const &m)
         std::cout << "{" << pair.first /*<< ": " << pair.second */<< "}\n";
     }
 }
-
-

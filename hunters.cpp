@@ -23,12 +23,11 @@ void Hunters::loop(int size, int rank){
 				//std::cout << WHITE << Monitor::getLamport() << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia " << packet.orderNumber << " dla łowcy " << packet.from << RESET << std::endl;	
 			} else if(packet.tag == YOU_CAN_GO){
                         	Monitor::ackCount += 1;
-				std::cout << YELLOW << Monitor::ackCount << RESET << std::endl;
 			}
 			Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT - 1){
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT){
 			std::cout << YELLOW << "Chłop na misji KEKW" << RESET << std::endl;
 			sleep(200);
 		}
@@ -49,7 +48,8 @@ void Hunters::handleNewMessage(packet_t packet){
 		Hunters::state = HuntersState::TRYING_ORDER;
 		
 		Monitor::mission_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
-	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));	
+	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));
+		Monitor::mission_q.clear();
 		//Monitor::print_map(Monitor::missions_queues);
 		//sleep(rand()%2+1);
 		//std::cout << YELLOW << packet.lamport+1 << ": Łowca " << Monitor::rank << " pyta innych czy może wyruszyć na misję"  << RESET << std::endl;
@@ -67,12 +67,12 @@ void Hunters::handleNewMessage(packet_t packet){
 			Monitor::missions_queues.find(packet.orderNumber)->second.push_front(std::make_pair(packet.lamport,packet.from));
 		}
 		//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.size() << RESET << std::endl;
-		if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT){
+		if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT - Monitor::onMission.size()){
 		//if(Monitor::rank == 7){	
-			//cout << packet.orderNumber << ": ";
-			//for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
-        			//cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';
-    			//}
+			cout << packet.orderNumber << ": ";
+			for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
+        			cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';
+    			}
 			//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second << RESET << std::endl;
 			std::sort(Monitor::missions_queues.find(packet.orderNumber)->second.begin(),Monitor::missions_queues.find(packet.orderNumber)->second.end(),Monitor::myComparison);
 			
