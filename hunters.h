@@ -21,6 +21,7 @@ class Hunters {
 		static int getMyLamportInQueue(int orderNum);
 		static void sendAckToWinner(packet_t packet);
 		static bool checkWinner(int winner);
+		static bool canGoMission(int rank);
 
 	public:
         	static void loop(int size, int rank);

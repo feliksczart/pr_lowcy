@@ -12,6 +12,7 @@ void Hunters::loop(int size, int rank){
 	while(1){
 		pthread_mutex_lock(&Monitor::incomingMissionMutex);
 		pthread_mutex_lock(&Monitor::messageQMutex);
+		
 		if(!Monitor::messageQ.empty()){
 			sleep(1);
 			packet_t packet = Monitor::messageQ.front();
@@ -24,10 +25,12 @@ void Hunters::loop(int size, int rank){
 			} else if(packet.tag == YOU_CAN_GO){
                         	Monitor::ackCount += 1;
 			}
-			Hunters::handleNewMessage(packet);
+			if(Monitor::onMission.size() < HUNTERS_COUNT-1)
+				Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT){
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT || Monitor::onMission.size() == HUNTERS_COUNT-1){
+		//if(Hunters::canGoMission(rank)){	
 			std::cout << YELLOW << "Chłop na misji KEKW" << RESET << std::endl;
 			sleep(200);
 		}
@@ -44,7 +47,7 @@ void *incomingMissionMonitor (void* x) {
 }	
 
 void Hunters::handleNewMessage(packet_t packet){
-	if(packet.tag == NEW_MISSION){
+	if(packet.tag == NEW_MISSION && !Hunters::canGoMission(Monitor::rank)){
 		Hunters::state = HuntersState::TRYING_ORDER;
 		
 		Monitor::mission_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
@@ -128,3 +131,13 @@ bool Hunters::checkWinner(int winner){
 	return true;
 }
 
+bool Hunters::canGoMission(int rank){
+	if(Monitor::onMission.size() == 0)
+        	return false;
+        for(int i = 0; i < Monitor::onMission.size(); i++){
+		//std::cout << YELLOW << Monitor::onMission.at(i) << RESET << std::endl;
+		if(Monitor::onMission.at(i) == rank)
+                         return true;
+	}
+        return false;
+}
