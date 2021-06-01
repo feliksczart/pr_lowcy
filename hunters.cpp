@@ -25,7 +25,7 @@ void Hunters::loop(int size, int rank){
 			} else if(packet.tag == YOU_CAN_GO){
                         	Monitor::ackCount += 1;
 			}
-			if(Monitor::onMission.size() < HUNTERS_COUNT-1)
+			if(Monitor::onMission.size() < HUNTERS_COUNT-1 && Hunters::checkWinner(packet.from))
 				Hunters::handleNewMessage(packet);
 		}
 
