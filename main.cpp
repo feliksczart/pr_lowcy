@@ -41,7 +41,7 @@ void finalize(){
 void countHunters(){
 	int siz;
         MPI_Comm_size(MPI_COMM_WORLD,&siz);
-        for(int i = 0; i <= siz; i++){
+        for(int i = 0; i < siz; i++){
         	if(i%4!=0){
                 	HUNTERS_COUNT++;	
         	}

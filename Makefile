@@ -13,5 +13,5 @@ clean:
 	rm main a.out
 
 run: main 
-	mpirun --hostfile ./hostfile -np 8 ./main
+	mpirun --hostfile ./hostfile -np 2 ./main
 

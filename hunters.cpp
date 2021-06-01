@@ -32,7 +32,7 @@ void Hunters::loop(int size, int rank){
 				Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || (Monitor::onMission.size() == HUNTERS_COUNT-1 && missRcv)){
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv)){
 		//if(Hunters::canGoMission(rank)){	
 			std::cout << YELLOW << "Chłop na misji KEKW" << RESET << std::endl;
 			sleep(200);
