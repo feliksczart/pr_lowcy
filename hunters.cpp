@@ -87,7 +87,7 @@ void Hunters::sendOrderReq(packet_t packet){
         MPI_Comm_size(MPI_COMM_WORLD,&siz);
 	packet.lamport = Hunters::getMyLamportInQueue(packet.orderNumber);
 	packet.from = Monitor::rank;
-        for(int i = 0; i <= siz; i++){
+        for(int i = 0; i < siz; i++){
         	if(i%4!=0 && i != Monitor::rank){
                 	Monitor::sendMessage(&packet,i,ORDER_REQ);
                 }

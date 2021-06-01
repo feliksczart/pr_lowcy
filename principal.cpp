@@ -42,8 +42,8 @@ void Principal::loop(int size, int rank){
                 
 		packet.lamport = Monitor::getLamport();
         	packet.from = Monitor::rank;
-		for(int i = 0; i <= siz; i++){
-			if(i%4!=0){	
+		for(int i = 0; i < siz; i++){
+			if(i%4!=0){
                 		Monitor::sendMessage(&packet,i,NEW_MISSION);
 			}
 		}
