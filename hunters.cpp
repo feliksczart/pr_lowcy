@@ -29,7 +29,7 @@ void Hunters::loop(int size, int rank){
 				Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT || Monitor::onMission.size() == HUNTERS_COUNT-1){
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || Monitor::onMission.size() == HUNTERS_COUNT-1){
 		//if(Hunters::canGoMission(rank)){	
 			std::cout << YELLOW << "Chłop na misji KEKW" << RESET << std::endl;
 			sleep(200);
@@ -78,9 +78,10 @@ void Hunters::handleNewMessage(packet_t packet){
     			}
 			//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second << RESET << std::endl;
 			std::sort(Monitor::missions_queues.find(packet.orderNumber)->second.begin(),Monitor::missions_queues.find(packet.orderNumber)->second.end(),Monitor::myComparison);
-			
-			Hunters::sendAckToWinner(packet);
-			Monitor::deleteQueue(packet.orderNumber);
+			if(!Hunters::canGoMission(Monitor::rank)){	
+				Hunters::sendAckToWinner(packet);
+				Monitor::deleteQueue(packet.orderNumber);
+			}
 		}
 	}
 }
