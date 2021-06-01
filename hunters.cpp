@@ -9,6 +9,8 @@ void Hunters::loop(int size, int rank){
 	pthread_t incomingMissionThread;
 	pthread_create(&incomingMissionThread,NULL,&incomingMissionMonitor,NULL);
 	
+	bool missRcv = false;	
+
 	while(1){
 		pthread_mutex_lock(&Monitor::incomingMissionMutex);
 		pthread_mutex_lock(&Monitor::messageQMutex);
@@ -19,6 +21,7 @@ void Hunters::loop(int size, int rank){
 			Monitor::messageQ.pop();
 			if(packet.tag == NEW_MISSION){
 				sleep(rand()%3+1);
+				missRcv = true;
 				std::cout << GREEN << Monitor::getLamport() << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
 			} else if(packet.tag == ORDER_REQ){
 				//std::cout << WHITE << Monitor::getLamport() << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia " << packet.orderNumber << " dla łowcy " << packet.from << RESET << std::endl;	
@@ -29,11 +32,13 @@ void Hunters::loop(int size, int rank){
 				Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || Monitor::onMission.size() == HUNTERS_COUNT-1){
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || (Monitor::onMission.size() == HUNTERS_COUNT-1 && missRcv)){
 		//if(Hunters::canGoMission(rank)){	
 			std::cout << YELLOW << "Chłop na misji KEKW" << RESET << std::endl;
 			sleep(200);
 		}
+		
+		missRcv = false;
                         
 		pthread_mutex_unlock(&Monitor::messageQMutex);
 		pthread_mutex_unlock(&Monitor::incomingMissionMutex);
