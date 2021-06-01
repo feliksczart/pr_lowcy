@@ -19,8 +19,10 @@ using namespace std;
 #define NEW_MISSION 100
 #define ORDER_REQ 101
 #define YOU_CAN_GO 102
+#define SHOP_REQ 103
 #define MISSION_FINISHED 200
 #define WAIT_HUNTERS 2
+#define MAX_SHOP 3
 
 extern int HUNTERS_COUNT;
 

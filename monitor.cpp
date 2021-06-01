@@ -10,6 +10,9 @@ int Monitor::currentMissions = 0;
 unsigned int Monitor::lamport = 0;
 bool Monitor::listening = false;
 int Monitor::ackCount = 0;
+bool Monitor::shopAsked = false;
+int Monitor::inShopCount = 0;
+int Monitor::ackShop = 0;
 
 std::queue<packet_t> Monitor::messageQ;
 std::deque<pair<unsigned int,int>> Monitor::mission_q;

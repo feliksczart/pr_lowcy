@@ -9,7 +9,8 @@ void Hunters::loop(int size, int rank){
 	pthread_t incomingMissionThread;
 	pthread_create(&incomingMissionThread,NULL,&incomingMissionMonitor,NULL);
 	
-	bool missRcv = false;	
+	bool missRcv = false;
+	packet_t packet;	
 
 	while(1){
 		pthread_mutex_lock(&Monitor::incomingMissionMutex);
@@ -17,29 +18,33 @@ void Hunters::loop(int size, int rank){
 		
 		if(!Monitor::messageQ.empty()){
 			sleep(1);
-			packet_t packet = Monitor::messageQ.front();
+			packet = Monitor::messageQ.front();
 			Monitor::messageQ.pop();
-			if(packet.tag == NEW_MISSION){
+			//std::cout << GREEN << packet.tag << RESET << std::endl;
+			if(packet.tag == NEW_MISSION && Hunters::state != HuntersState::WAITING_SHOP){
 				sleep(rand()%3+1);
 				missRcv = true;
 				std::cout << GREEN << Monitor::getLamport() << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
-			} else if(packet.tag == ORDER_REQ){
+			} else if(packet.tag == ORDER_REQ && Hunters::state != HuntersState::WAITING_SHOP){
 				//std::cout << WHITE << Monitor::getLamport() << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia " << packet.orderNumber << " dla łowcy " << packet.from << RESET << std::endl;	
-			} else if(packet.tag == YOU_CAN_GO){
+			} else if(packet.tag == YOU_CAN_GO && Hunters::state != HuntersState::WAITING_SHOP){
                         	Monitor::ackCount += 1;
 			}
-			if(Monitor::onMission.size() < HUNTERS_COUNT-1 && Hunters::checkWinner(packet.from))
+			if(Monitor::onMission.size() < HUNTERS_COUNT-1 && Hunters::checkWinner(packet.from) || packet.tag == SHOP_REQ)
+				//std::cout << GREEN << packet.tag << RESET << std::endl;
 				Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv)){
-		//if(Hunters::canGoMission(rank)){	
-			std::cout << YELLOW << "Chłop na misji KEKW" << RESET << std::endl;
-			sleep(200);
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
+		//if(Hunters::canGoMission(rank)){
+			Hunters::state = HuntersState::WAITING_SHOP;	
+			std::cout << BLUE << Monitor::getLamport() << ": Łowca " << rank << " rusza do sklepu" << RESET << std::endl;
+			//Hunters::goToShop(packet);
+			sleep(200);	
 		}
 		
 		missRcv = false;
-                        
+		
 		pthread_mutex_unlock(&Monitor::messageQMutex);
 		pthread_mutex_unlock(&Monitor::incomingMissionMutex);
 
@@ -53,7 +58,6 @@ void *incomingMissionMonitor (void* x) {
 
 void Hunters::handleNewMessage(packet_t packet){
 	if(packet.tag == NEW_MISSION && !Hunters::canGoMission(Monitor::rank)){
-		Hunters::state = HuntersState::TRYING_ORDER;
 		
 		Monitor::mission_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
 	       	Monitor::missions_queues.insert(std::make_pair(packet.orderNumber,Monitor::mission_q));
@@ -88,6 +92,8 @@ void Hunters::handleNewMessage(packet_t packet){
 				Monitor::deleteQueue(packet.orderNumber);
 			}
 		}
+	} else if(packet.tag == SHOP_REQ){
+		std::cout << BLUE << "Elo" << RESET << std::endl;
 	}
 }
 
@@ -146,4 +152,29 @@ bool Hunters::canGoMission(int rank){
                          return true;
 	}
         return false;
+}
+
+void Hunters::goToShop(packet_t packet){
+	if(!Monitor::shopAsked){
+		Hunters::askHowMuchInShop(packet);
+	}
+	if(Monitor::inShopCount < MAX_SHOP && Monitor::ackShop == HUNTERS_COUNT - 1){
+		std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
+		sleep(200);
+	}
+}
+
+void Hunters::askHowMuchInShop(packet_t packet){
+	int siz;
+        MPI_Comm_size(MPI_COMM_WORLD,&siz);
+        packet.lamport = Monitor::getLamport();
+        packet.from = Monitor::rank;
+        for(int i = 0; i < siz; i++){
+                if(i%4!=0 && i != Monitor::rank){
+                        Monitor::sendMessage(&packet,i,SHOP_REQ);
+                }
+        }
+	Monitor::shopAsked = true;
+        Monitor::incrementLamport();
+
 }

@@ -22,7 +22,8 @@ class Hunters {
 		static void sendAckToWinner(packet_t packet);
 		static bool checkWinner(int winner);
 		static bool canGoMission(int rank);
-
+		static void goToShop(packet_t packet);
+		static void askHowMuchInShop(packet_t packet);
 	public:
         	static void loop(int size, int rank);
 };

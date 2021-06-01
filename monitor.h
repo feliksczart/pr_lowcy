@@ -14,6 +14,9 @@ class Monitor {
 		static int LM;
 		static int ackCount;
 		static int currentMissions;
+		static bool shopAsked;
+		static int inShopCount;
+		static int ackShop;
 		static pthread_mutex_t missionsMutex;
     		static pthread_mutex_t newMissionMutex;
     		static pthread_mutex_t waitHuntersMutex;
