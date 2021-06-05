@@ -40,7 +40,8 @@ void Hunters::loop(int size, int rank){
 				Hunters::handleNewMessage(packet);
 		}
 
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
+		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
+			Hunters::sendAckIGo(packet);
 			Hunters::state = HuntersState::WAITING_SHOP;
 			Hunters::listenPrincipal = false;
 			if(!goShopPrinted)	
@@ -160,6 +161,19 @@ bool Hunters::canGoMission(int rank){
         return false;
 }
 
+void Hunters::sendAckIGo(packet_t packet){
+	int siz;
+        MPI_Comm_size(MPI_COMM_WORLD,&siz);
+        packet.lamport = Monitor::getLamport();
+        packet.from = Monitor::rank;
+        for(int i = 0; i < siz; i++){
+                if(i%4!=0 && i != Monitor::rank){
+                        Monitor::sendMessage(&packet,i,I_GO);
+                }
+        }
+        Monitor::incrementLamport();
+}
+
 void Hunters::goToShop(packet_t packet){
 	if(!Monitor::shopAsked){
 		Hunters::askHowMuchInShop(packet);
@@ -274,6 +288,11 @@ void Hunters::sendMissionDone(packet_t packet){
         packet.lamport = Monitor::getLamport();
         packet.from = Monitor::rank;
         Monitor::sendMessage(&packet,target,MISSION_FINISHED);
+	for(int i = 0; i < siz; i++){
+                if(i%4!=0 && i != Monitor::rank){
+                        Monitor::sendMessage(&packet,i,MISSION_FINISHED);
+                }
+        }
         Monitor::incrementLamport();
 	Hunters::resetHunters();
 }
@@ -287,4 +306,7 @@ int Hunters::getMissionPrincipal(int mission){
 void Hunters::resetHunters(){
 	Hunters::listenPrincipal = true;
 	Hunters::state = HuntersState::WAITING_ORDER;
+	std::queue<packet_t> empty;
+	std::swap(Monitor::messageQ, empty);
+	Monitor::onMission.erase(std::remove(Monitor::onMission.begin(), Monitor::onMission.end(), Monitor::rank), Monitor::onMission.end());
 }

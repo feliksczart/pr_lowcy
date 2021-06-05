@@ -78,7 +78,12 @@ void Monitor::listen(){
 			if(Monitor::shop_q.size()>0)
                                 Monitor::shop_q.erase(Monitor::shop_q.begin());
                 	Monitor::inShop.push_back(packet.from);
-		} else if (Hunters::listenPrincipal) {
+		} else if(packet.tag == I_GO){
+			if(!Monitor::inOnMission(packet.from))
+                        	Monitor::onMission.push_back(packet.from);
+                } else if(packet.tag == MISSION_FINISHED){
+                	Monitor::onMission.erase(std::remove(Monitor::onMission.begin(), Monitor::onMission.end(), packet.from), Monitor::onMission.end());
+                } else if (Hunters::listenPrincipal) {
 			pthread_mutex_lock(&Monitor::messageQMutex);
 			Monitor::messageQ.push(packet);
 			pthread_mutex_unlock(&Monitor::messageQMutex);
@@ -135,3 +140,11 @@ int Monitor::getMyLamportShopQueue(){
         return 0;
 }
 
+bool Monitor::inOnMission(int x){
+	if(Monitor::onMission.size() ==0)
+		return false;
+	for(int i = 0; i < Monitor::onMission.size(); i++)
+		if(Monitor::onMission.at(i) == x)
+			return true;
+	return false;
+}

@@ -50,9 +50,9 @@ void Principal::loop(int size, int rank){
                 		Monitor::sendMessage(&packet,i,NEW_MISSION);
 			}
 		}
-		if (rank == 0 && orderId > 3)
-                        sleep(rand()%40);
-                else if(rank!=0)
+		//if (rank == 0 && orderId > 3)
+                  //      sleep(rand()%40);
+                if(rank!=0)
                         sleep(rand()%100+100);
 
         	orderId++;

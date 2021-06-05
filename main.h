@@ -24,6 +24,7 @@ using namespace std;
 #define FALSE 105
 #define OUT 106
 #define IN 107
+#define I_GO 108
 #define MISSION_FINISHED 200
 #define WAIT_HUNTERS 2
 

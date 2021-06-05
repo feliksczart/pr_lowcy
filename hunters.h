@@ -26,6 +26,7 @@ class Hunters {
 		static bool canGoShop(int rank);
 		static void sendAckToQueue(packet_t packet);
 		static void sendAckInShop(packet_t packet);
+		static void sendAckIGo(packet_t packet);
 		static bool checkShopWinner(int winner);
 		static bool waitPrinted;
 		static void goMission(packet_t packet);

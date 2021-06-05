@@ -44,6 +44,7 @@ class Monitor {
 		static void deleteQueue(int orderNum);
 		static bool myComparison(const pair<unsigned int,int> &a,const pair<unsigned int,int> &b);
 		static int getMyLamportShopQueue();
+		static bool inOnMission(int x);
 		static void finalize();
 
 		static void print_map(map<int, deque<pair<unsigned int,int>>> const &m);
