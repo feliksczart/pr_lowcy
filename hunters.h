@@ -23,6 +23,8 @@ class Hunters {
 		static bool canGoMission(int rank);
 		static void goToShop(packet_t packet);
 		static void askHowMuchInShop(packet_t packet);
+		static bool canGoShop(int rank);
+		static void sendAckToQueue(packet_t packet);
 	public:
         	static void loop(int size, int rank);
 		static HuntersState state;

@@ -93,15 +93,7 @@ void Hunters::handleNewMessage(packet_t packet){
 				Monitor::deleteQueue(packet.orderNumber);
 			}
 		}
-	} //else if(packet.tag == TRUE_IN){
-	//	std::cout << BLUE << "Elo" << RESET << std::endl;
-//		Monitor::inShopCount++;
-//		Monitor::ackShop++;
-//	} else if(packet.tag == FALSE_IN){
-  //              std::cout << BLUE << "Elo2222" << RESET << std::endl;
-    //            Monitor::ackShop++;
-      //  }
-
+	}	
 }
 
 void Hunters::sendOrderReq(packet_t packet){
@@ -164,12 +156,24 @@ bool Hunters::canGoMission(int rank){
 void Hunters::goToShop(packet_t packet){
 	if(!Monitor::shopAsked){
 		Hunters::askHowMuchInShop(packet);
+		Monitor::shop_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
 	}
 	sleep(1);
-	if(Monitor::inShopCount < MAX_SHOP && Monitor::ackShop == HUNTERS_COUNT - 1){
-		Hunters::state = HuntersState::IN_SHOP;
-		std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
-		sleep(200);
+	if(Monitor::ackShop == HUNTERS_COUNT - 1){
+		if(Monitor::shop_q.size()>1)
+			std::sort(Monitor::shop_q.begin(),Monitor::shop_q.end(),Monitor::myComparison);
+		int winner = Monitor::shop_q.at(0).second;
+		if(Monitor::rank == winner){
+			Monitor::shop_q.erase(Monitor::shop_q.begin());
+			Hunters::state = HuntersState::IN_SHOP;
+			std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
+			sleep(10);
+			Hunters::sendAckToQueue(packet);
+			sleep(200);	
+		} else {
+			Monitor::ackShop--;
+			Monitor::shop_q.erase(Monitor::shop_q.begin());
+		}
 	}
 }
 
@@ -184,6 +188,20 @@ void Hunters::askHowMuchInShop(packet_t packet){
                 }
         }
 	Monitor::shopAsked = true;
+        Monitor::incrementLamport();
+
+}
+
+void Hunters::sendAckToQueue(packet_t packet){
+	int siz;
+        MPI_Comm_size(MPI_COMM_WORLD,&siz);
+        packet.lamport = Monitor::getLamport();
+        packet.from = Monitor::rank;
+        for(int i = 0; i < siz; i++){
+                if(i%4!=0 && i != Monitor::rank){
+                        Monitor::sendMessage(&packet,i,FALSE);
+                }
+        }
         Monitor::incrementLamport();
 
 }

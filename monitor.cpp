@@ -12,7 +12,6 @@ unsigned int Monitor::lamport = 0;
 bool Monitor::listening = false;
 int Monitor::ackCount = 0;
 bool Monitor::shopAsked = false;
-int Monitor::inShopCount = 0;
 int Monitor::ackShop = 0;
 
 std::queue<packet_t> Monitor::messageQ;
@@ -20,6 +19,7 @@ std::deque<pair<unsigned int,int>> Monitor::mission_q;
 std::pair<unsigned int,int> Monitor::hunter_p;
 std::map<int, deque<pair<unsigned int,int>>> Monitor::missions_queues;
 std::deque<int> Monitor::onMission;
+std::deque<pair<unsigned int,int>> Monitor::shop_q;
 
 pthread_mutex_t Monitor::lamportMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Monitor::missionsMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -55,19 +55,18 @@ void Monitor::listen(){
 		packet = Monitor::receiveMessage();
 		if(packet.tag == SHOP_REQ){
 			int target = packet.from;
+			Monitor::shop_q.push_back(std::make_pair(packet.lamport,target));
                         packet.from = Monitor::rank;
-                        packet.lamport = Monitor::getLamport();
-			if(Hunters::state == HuntersState::IN_SHOP){
-				Monitor::sendMessage(&packet,target,TRUE_IN);
+                        packet.lamport = Monitor::getMyLamportShopQueue();
+			if(Hunters::state == HuntersState::WAITING_SHOP){
+				Monitor::sendMessage(&packet,target,TRUE);
 			} else {
-				Monitor::sendMessage(&packet,target,FALSE_IN);
+				Monitor::sendMessage(&packet,target,FALSE);
 			}
-		} else if(packet.tag == TRUE_IN){
-                	std::cout << BLUE << "Elo" << RESET << std::endl;
-                	Monitor::inShopCount++;
+		} else if(packet.tag == TRUE){
                 	Monitor::ackShop++;
-        	} else if(packet.tag == FALSE_IN){
-                	std::cout << BLUE << "Elo2222" << RESET << std::endl;
+			Monitor::shop_q.push_back(std::make_pair(packet.lamport,packet.from));
+        	} else if(packet.tag == FALSE){
                 	Monitor::ackShop++;
         	} else {
 			pthread_mutex_lock(&Monitor::messageQMutex);
@@ -116,3 +115,13 @@ void Monitor::print_map(map<int, deque<pair<unsigned int,int>>> const &m)
         std::cout << "{" << pair.first /*<< ": " << pair.second */<< "}\n";
     }
 }
+
+int Monitor::getMyLamportShopQueue(){
+        for (int i = 0; i < Monitor::shop_q.size(); i++){
+                if(Monitor::shop_q.at(i).second == Monitor::rank){
+                        return Monitor::shop_q.at(i).first;
+                }
+        }
+        return 0;
+}
+
