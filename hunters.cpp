@@ -188,7 +188,10 @@ void Hunters::goToShop(packet_t packet){
 			std::cout << WHITE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wyszedł ze sklepu" << RESET << std::endl;
 			Hunters::sendAckToQueue(packet);
 			Hunters::state = HuntersState::ON_MISSION;
-			sleep(200);	
+			Monitor::incrementLamport();
+			sleep(5);
+			std::cout << CYAN << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wyrusza na misję" << RESET << std::endl;
+			Hunters::goMission(packet);	
 		} else {
 			Monitor::ackShop--;
 		}
@@ -251,4 +254,11 @@ bool Hunters::checkShopWinner(int winner){
                 if(Monitor::inShop.at(i) == winner)
                         return false;
         return true;
+}
+
+void Hunters::goMission(packet_t packet){
+	sleep(rand()%20);
+	Monitor::incrementLamport();
+	std::cout << CYAN << Monitor::getLamport() << ": Łowca " << Monitor::rank << " ukończył misję" << RESET << std::endl;
+	//Hunters::sendMissionDone(packet);
 }
