@@ -160,12 +160,20 @@ void Hunters::goToShop(packet_t packet){
 	}
 	sleep(1);
 	std::cout << WHITE << Monitor::rank << "::" << Monitor::ackShop << RESET << std::endl;
-	if(Monitor::ackShop == HUNTERS_COUNT - 1){
-		if(Monitor::shop_q.size()>1)
-			std::sort(Monitor::shop_q.begin(),Monitor::shop_q.end(),Monitor::myComparison);
-		int winner = Monitor::shop_q.at(0).second;
+	if(Monitor::shop_q.size()>1)
+                std::sort(Monitor::shop_q.begin(),Monitor::shop_q.end(),Monitor::myComparison);
+	int winner;
+        for (int i = 0; i < Monitor::shop_q.size(); i++){
+                winner = Monitor::shop_q.at(i).second;
+                if(checkShopWinner(winner)) break;
+        }
+	if(Monitor::ackShop >= HUNTERS_COUNT - MAX_SHOP){
 		std::cout << YELLOW << winner << RESET << std::endl;
 		if(Monitor::rank == winner){
+			while(Monitor::inShop.size() >= MAX_SHOP){
+				sleep(1);
+			}
+			Hunters::sendAckInShop(packet);
 			Monitor::shop_q.erase(Monitor::shop_q.begin());
 			Hunters::state = HuntersState::IN_SHOP;
 			std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
@@ -196,6 +204,19 @@ void Hunters::askHowMuchInShop(packet_t packet){
 
 }
 
+void Hunters::sendAckInShop(packet_t packet){
+	int siz;
+        MPI_Comm_size(MPI_COMM_WORLD,&siz);
+        packet.lamport = Monitor::getLamport();
+        packet.from = Monitor::rank;
+        for(int i = 0; i < siz; i++){
+                if(i%4!=0 && i != Monitor::rank){
+                        Monitor::sendMessage(&packet,i,IN);
+                }
+        }
+        Monitor::incrementLamport();
+}
+
 void Hunters::sendAckToQueue(packet_t packet){
 	int siz;
         MPI_Comm_size(MPI_COMM_WORLD,&siz);
@@ -208,4 +229,13 @@ void Hunters::sendAckToQueue(packet_t packet){
         }
         Monitor::incrementLamport();
 
+}
+
+bool Hunters::checkShopWinner(int winner){
+        if(Monitor::inShop.size() == 0)
+                return true;
+        for(int i = 0; i < Monitor::inShop.size(); i++)
+                if(Monitor::inShop.at(i) == winner)
+                        return false;
+        return true;
 }

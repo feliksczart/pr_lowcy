@@ -23,9 +23,10 @@ using namespace std;
 #define TRUE 104
 #define FALSE 105
 #define OUT 106
+#define IN 107
 #define MISSION_FINISHED 200
 #define WAIT_HUNTERS 2
-#define MAX_SHOP 1
+#define MAX_SHOP 2
 
 extern int HUNTERS_COUNT;
 

@@ -14,6 +14,7 @@ int Monitor::ackCount = 0;
 bool Monitor::shopAsked = false;
 int Monitor::ackShop = 0;
 
+std::deque<int> Monitor::inShop;
 std::queue<packet_t> Monitor::messageQ;
 std::deque<pair<unsigned int,int>> Monitor::mission_q;
 std::pair<unsigned int,int> Monitor::hunter_p;
@@ -72,7 +73,10 @@ void Monitor::listen(){
                         if(Monitor::shop_q.size()>0)
                                 Monitor::shop_q.erase(Monitor::shop_q.begin());
                         Monitor::ackShop++;
-                } else {
+			Monitor::inShop.erase(std::remove(Monitor::inShop.begin(), Monitor::inShop.end(), packet.from), Monitor::inShop.end());
+                } else if(packet.tag == IN){
+                	Monitor::inShop.push_back(packet.from);
+		} else {
 			pthread_mutex_lock(&Monitor::messageQMutex);
 			Monitor::messageQ.push(packet);
 			pthread_mutex_unlock(&Monitor::messageQMutex);

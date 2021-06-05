@@ -17,11 +17,14 @@ class Monitor {
 		static bool shopAsked;
 		static int inShopCount;
 		static int ackShop;
+
 		static pthread_mutex_t missionsMutex;
     		static pthread_mutex_t newMissionMutex;
     		static pthread_mutex_t waitHuntersMutex;
 		static pthread_mutex_t messageQMutex;
 		static pthread_mutex_t incomingMissionMutex;
+		
+		static std::deque<int> inShop;		
 		static std::queue<packet_t> messageQ;
 		static std::deque<int> onMission;
 		//queue trzymający id i zegar lamporta łowcy	
