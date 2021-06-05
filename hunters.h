@@ -29,6 +29,10 @@ class Hunters {
 		static bool checkShopWinner(int winner);
 		static bool waitPrinted;
 		static void goMission(packet_t packet);
+		static void sendMissionDone(packet_t packet);
+		static int getMissionPrincipal(int mission);
+		static int wonMissionNum;
+		static void resetHunters();
 	public:
         	static void loop(int size, int rank);
 		static HuntersState state;

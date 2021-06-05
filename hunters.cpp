@@ -5,6 +5,8 @@
 HuntersState Hunters::state = HuntersState::WAITING_ORDER;
 bool Hunters::listenPrincipal = true;
 bool Hunters::waitPrinted = false;
+int Hunters::wonMissionNum;
+
 
 void Hunters::loop(int size, int rank){
 	//wątek oczekujący na nowe zlecenia
@@ -27,6 +29,7 @@ void Hunters::loop(int size, int rank){
 			if(packet.tag == NEW_MISSION && Hunters::state != HuntersState::WAITING_SHOP){
 				sleep(rand()%3+1);
 				missRcv = true;
+				Monitor::principal_mission.push_back(std::make_pair(packet.from,packet.orderNumber));	
 				std::cout << GREEN << Monitor::getLamport() << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
 			} else if(packet.tag == ORDER_REQ && Hunters::state != HuntersState::WAITING_SHOP){
 				//std::cout << WHITE << Monitor::getLamport() << ": Łowca " << rank << " otrzymał request o przydzielenie zlecenia " << packet.orderNumber << " dla łowcy " << packet.from << RESET << std::endl;	
@@ -95,6 +98,7 @@ void Hunters::handleNewMessage(packet_t packet){
 				Hunters::sendAckToWinner(packet);
 				Monitor::deleteQueue(packet.orderNumber);
 			}
+			Hunters::wonMissionNum = packet.orderNumber;
 		}
 	}	
 }
@@ -260,5 +264,27 @@ void Hunters::goMission(packet_t packet){
 	sleep(rand()%20);
 	Monitor::incrementLamport();
 	std::cout << CYAN << Monitor::getLamport() << ": Łowca " << Monitor::rank << " ukończył misję" << RESET << std::endl;
-	//Hunters::sendMissionDone(packet);
+	Hunters::sendMissionDone(packet);
+}
+
+void Hunters::sendMissionDone(packet_t packet){
+	int target = getMissionPrincipal(Hunters::wonMissionNum);
+	int siz;
+        MPI_Comm_size(MPI_COMM_WORLD,&siz);
+        packet.lamport = Monitor::getLamport();
+        packet.from = Monitor::rank;
+        Monitor::sendMessage(&packet,target,MISSION_FINISHED);
+        Monitor::incrementLamport();
+	Hunters::resetHunters();
+}
+
+int Hunters::getMissionPrincipal(int mission){
+	for(int i = 0; i < Monitor::principal_mission.size(); i++)
+		if(Monitor::principal_mission.at(i).second == mission)
+			return Monitor::principal_mission.at(i).first;
+}
+
+void Hunters::resetHunters(){
+	Hunters::listenPrincipal = true;
+	Hunters::state = HuntersState::WAITING_ORDER;
 }

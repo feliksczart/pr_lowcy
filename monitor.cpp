@@ -21,6 +21,7 @@ std::pair<unsigned int,int> Monitor::hunter_p;
 std::map<int, deque<pair<unsigned int,int>>> Monitor::missions_queues;
 std::deque<int> Monitor::onMission;
 std::deque<pair<unsigned int,int>> Monitor::shop_q;
+std::deque<pair<int,int>> Monitor::principal_mission;
 
 pthread_mutex_t Monitor::lamportMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Monitor::missionsMutex = PTHREAD_MUTEX_INITIALIZER;

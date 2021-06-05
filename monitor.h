@@ -32,7 +32,8 @@ class Monitor {
 		static std::pair<unsigned int, int> hunter_p;
 		static std::map<int, deque<pair<unsigned int,int>>> missions_queues;
 		static std::deque<pair<unsigned int,int>> shop_q;
-		
+		static std::deque<pair<int,int>> principal_mission;	
+	
 		static void initialize();
 		static void sendMessage(packet_t *packet, int target, int tag);
     		static packet_t receiveMessage();

@@ -70,20 +70,8 @@ void *principalMonitor (void* x) {
 	     	sleep(2);
              	packet = Monitor::receiveMessage();
              	if(packet.tag == MISSION_FINISHED){
-                	pthread_create( &handleMission, NULL, &handleMissionFinished,NULL);
-
+			std::cout << RED << Monitor::getLamport() << ": Zleceniodawca " << Monitor::rank << " przyjął informację o skończonej misji drużyny " << packet.from << RESET << std::endl;
+			Monitor::currentMissions-=1;
              }
      }
-}
-
-void *handleMissionFinished(void* x) {
-
-     int t = rand()%2+1;
-     sleep(t);
-     pthread_mutex_lock(&Monitor::missionsMutex);
-     Monitor::currentMissions-=1;
-     pthread_mutex_unlock(&Monitor::missionsMutex);
-     pthread_mutex_unlock(&Monitor::newMissionMutex);
-     printf("%u: X %ds\n",Monitor::getLamport(),t);
-     pthread_exit(NULL);
 }
