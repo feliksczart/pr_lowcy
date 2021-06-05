@@ -3,6 +3,8 @@
 #include <iostream>
 
 HuntersState Hunters::state = HuntersState::WAITING_ORDER;
+bool Hunters::listenPrincipal = true;
+bool Hunters::waitPrinted = false;
 
 void Hunters::loop(int size, int rank){
 	//wątek oczekujący na nowe zlecenia
@@ -11,7 +13,7 @@ void Hunters::loop(int size, int rank){
 	
 	bool missRcv = false;
 	bool goShopPrinted = false;
-	packet_t packet;	
+	packet_t packet;
 
 	while(1){
 		pthread_mutex_lock(&Monitor::incomingMissionMutex);
@@ -37,6 +39,7 @@ void Hunters::loop(int size, int rank){
 
 		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
 			Hunters::state = HuntersState::WAITING_SHOP;
+			Hunters::listenPrincipal = false;
 			if(!goShopPrinted)	
 				std::cout << BLUE << Monitor::getLamport() << ": Łowca " << rank << " rusza do sklepu" << RESET << std::endl;
 			goShopPrinted = true;
@@ -160,6 +163,9 @@ void Hunters::goToShop(packet_t packet){
 	}
 	sleep(1);
 	//std::cout << WHITE << Monitor::rank << "::" << Monitor::ackShop << RESET << std::endl;
+	//std::cout << WHITE << (Monitor::inShop.size() < MAX_SHOP) << RESET << std::endl;
+	
+	if(Monitor::inShop.size() < MAX_SHOP){
 	if(Monitor::shop_q.size()>1)
                 std::sort(Monitor::shop_q.begin(),Monitor::shop_q.end(),Monitor::myComparison);
 	int winner;
@@ -185,6 +191,13 @@ void Hunters::goToShop(packet_t packet){
 			sleep(200);	
 		} else {
 			Monitor::ackShop--;
+		}
+	}
+	} else{
+		if(!Hunters::waitPrinted){
+			Hunters::waitPrinted = true;
+			Monitor::incrementLamport();
+			std::cout << MAGENTA << Monitor::getLamport() << ": Łowca " << Monitor::rank << " czeka w kolejce do sklepu" << RESET << std::endl;
 		}
 	}
 }

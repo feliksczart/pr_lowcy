@@ -27,9 +27,11 @@ class Hunters {
 		static void sendAckToQueue(packet_t packet);
 		static void sendAckInShop(packet_t packet);
 		static bool checkShopWinner(int winner);
+		static bool waitPrinted;
 	public:
         	static void loop(int size, int rank);
 		static HuntersState state;
+		static bool listenPrincipal;
 };
 
 

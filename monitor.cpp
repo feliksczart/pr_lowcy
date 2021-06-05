@@ -37,7 +37,7 @@ void Monitor::initialize(){
 void Monitor::sendMessage(packet_t *packet, int target, int tag) {
     	
 	//std::cout << BLUE << packet->lamport << " id: " << Monitor::rank << RESET << std::endl;
-    	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
+	MPI_Send(packet, 1, MPI_PAKIET_T, target, tag, MPI_COMM_WORLD);
 }
 
 packet_t Monitor::receiveMessage() {
@@ -45,7 +45,7 @@ packet_t Monitor::receiveMessage() {
     	MPI_Status status;
     	MPI_Recv( &packet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 	packet.tag = status.MPI_TAG;
-    	Monitor::incrementLamportOnReceive(packet);
+	Monitor::incrementLamportOnReceive(packet);
 	return packet;
 }
 
@@ -70,13 +70,14 @@ void Monitor::listen(){
         	} else if(packet.tag == FALSE){
                 	Monitor::ackShop++;
         	} else if(packet.tag == OUT){
-                        if(Monitor::shop_q.size()>0)
-                                Monitor::shop_q.erase(Monitor::shop_q.begin());
+			//std::cout << YELLOW << Monitor::rank << "::" << packet.from << RESET << std::endl;
                         Monitor::ackShop++;
 			Monitor::inShop.erase(std::remove(Monitor::inShop.begin(), Monitor::inShop.end(), packet.from), Monitor::inShop.end());
                 } else if(packet.tag == IN){
+			if(Monitor::shop_q.size()>0)
+                                Monitor::shop_q.erase(Monitor::shop_q.begin());
                 	Monitor::inShop.push_back(packet.from);
-		} else {
+		} else if (Hunters::listenPrincipal) {
 			pthread_mutex_lock(&Monitor::messageQMutex);
 			Monitor::messageQ.push(packet);
 			pthread_mutex_unlock(&Monitor::messageQMutex);
