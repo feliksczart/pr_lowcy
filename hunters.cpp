@@ -40,8 +40,8 @@ void Hunters::loop(int size, int rank){
 			if(!goShopPrinted)	
 				std::cout << BLUE << Monitor::getLamport() << ": Łowca " << rank << " rusza do sklepu" << RESET << std::endl;
 			goShopPrinted = true;
+			sleep(rand()%2);
 			Hunters::goToShop(packet);
-			//sleep(200);	
 		}
 		
 		missRcv = false;
@@ -82,10 +82,10 @@ void Hunters::handleNewMessage(packet_t packet){
 		//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.size() << RESET << std::endl;
 		if(Monitor::missions_queues.find(packet.orderNumber)->second.size() == HUNTERS_COUNT - Monitor::onMission.size()){
 		//if(Monitor::rank == 7){	
-			cout << packet.orderNumber << ": ";
-			for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
-        			cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';
-    			}
+			//cout << packet.orderNumber << ": ";
+			//for (int i=0; i<Monitor::missions_queues.find(packet.orderNumber)->second.size(); ++i) {
+        			//cout << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).first << ":" << Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second << ' ';
+    			//}
 			//std::cout << BLUE << Monitor::missions_queues.find(packet.orderNumber)->second.at(0).second << RESET << std::endl;
 			std::sort(Monitor::missions_queues.find(packet.orderNumber)->second.begin(),Monitor::missions_queues.find(packet.orderNumber)->second.end(),Monitor::myComparison);
 			if(!Hunters::canGoMission(Monitor::rank)){	
@@ -126,7 +126,7 @@ void Hunters::sendAckToWinner(packet_t packet){
 		winner = Monitor::missions_queues.find(packet.orderNumber)->second.at(i).second;
 		if(checkWinner(winner)) break;
 	}
-	std::cout << GREEN << winner << RESET << std::endl;
+	//std::cout << GREEN << winner << RESET << std::endl;
 	if(Monitor::rank != winner)
 		Monitor::sendMessage(&packet,winner,YOU_CAN_GO);
 	Monitor::onMission.push_back(winner);
@@ -159,7 +159,7 @@ void Hunters::goToShop(packet_t packet){
 		Monitor::shop_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
 	}
 	sleep(1);
-	std::cout << WHITE << Monitor::rank << "::" << Monitor::ackShop << RESET << std::endl;
+	//std::cout << WHITE << Monitor::rank << "::" << Monitor::ackShop << RESET << std::endl;
 	if(Monitor::shop_q.size()>1)
                 std::sort(Monitor::shop_q.begin(),Monitor::shop_q.end(),Monitor::myComparison);
 	int winner;
@@ -168,7 +168,7 @@ void Hunters::goToShop(packet_t packet){
                 if(checkShopWinner(winner)) break;
         }
 	if(Monitor::ackShop >= HUNTERS_COUNT - MAX_SHOP){
-		std::cout << YELLOW << winner << RESET << std::endl;
+		//std::cout << YELLOW << winner << RESET << std::endl;
 		if(Monitor::rank == winner){
 			while(Monitor::inShop.size() >= MAX_SHOP){
 				sleep(1);
@@ -178,7 +178,7 @@ void Hunters::goToShop(packet_t packet){
 			Hunters::state = HuntersState::IN_SHOP;
 			std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
 			Monitor::incrementLamport();
-			sleep(10);
+			sleep(30);
 			std::cout << WHITE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wyszedł ze sklepu" << RESET << std::endl;
 			Hunters::sendAckToQueue(packet);
 			Hunters::state = HuntersState::ON_MISSION;

@@ -13,9 +13,9 @@ void Principal::loop(int size, int rank){
 	//wysyłanie zleceń
 	while(1){
 		if (rank == 0)
-			sleep(1);//rand()%40);
-		//else
-			//sleep(rand()%100);	
+			sleep(10);//rand()%40);
+		else
+			sleep(rand()%40+100);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);
 
         	pthread_mutex_lock(&Monitor::missionsMutex);
@@ -50,10 +50,10 @@ void Principal::loop(int size, int rank){
                 		Monitor::sendMessage(&packet,i,NEW_MISSION);
 			}
 		}
-		if (rank == 0 && orderId > 2)
+		if (rank == 0 && orderId > 3)
                         sleep(rand()%40);
-                else
-                        sleep(rand()%100);
+                else if(rank!=0)
+                        sleep(rand()%100+100);
 
         	orderId++;
 		Monitor::incrementLamport();
