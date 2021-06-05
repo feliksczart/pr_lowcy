@@ -10,6 +10,7 @@ void Hunters::loop(int size, int rank){
 	pthread_create(&incomingMissionThread,NULL,&incomingMissionMonitor,NULL);
 	
 	bool missRcv = false;
+	bool goShopPrinted = false;
 	packet_t packet;	
 
 	while(1){
@@ -30,17 +31,17 @@ void Hunters::loop(int size, int rank){
 			} else if(packet.tag == YOU_CAN_GO && Hunters::state != HuntersState::WAITING_SHOP){
                         	Monitor::ackCount += 1;
 			}
-			if(Monitor::onMission.size() < HUNTERS_COUNT-1 && Hunters::checkWinner(packet.from) || packet.tag == SHOP_REQ)
-				//std::cout << GREEN << packet.tag << RESET << std::endl;
+			if(Monitor::onMission.size() < HUNTERS_COUNT-1 && Hunters::checkWinner(packet.from))
 				Hunters::handleNewMessage(packet);
 		}
 
 		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT/*canGoMission(rank)*/ || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
-		//if(Hunters::canGoMission(rank)){
-			Hunters::state = HuntersState::WAITING_SHOP;	
-			std::cout << BLUE << Monitor::getLamport() << ": Łowca " << rank << " rusza do sklepu" << RESET << std::endl;
-			//Hunters::goToShop(packet);
-			sleep(200);	
+			Hunters::state = HuntersState::WAITING_SHOP;
+			if(!goShopPrinted)	
+				std::cout << BLUE << Monitor::getLamport() << ": Łowca " << rank << " rusza do sklepu" << RESET << std::endl;
+			goShopPrinted = true;
+			Hunters::goToShop(packet);
+			//sleep(200);	
 		}
 		
 		missRcv = false;
@@ -92,9 +93,15 @@ void Hunters::handleNewMessage(packet_t packet){
 				Monitor::deleteQueue(packet.orderNumber);
 			}
 		}
-	} else if(packet.tag == SHOP_REQ){
-		std::cout << BLUE << "Elo" << RESET << std::endl;
-	}
+	} //else if(packet.tag == TRUE_IN){
+	//	std::cout << BLUE << "Elo" << RESET << std::endl;
+//		Monitor::inShopCount++;
+//		Monitor::ackShop++;
+//	} else if(packet.tag == FALSE_IN){
+  //              std::cout << BLUE << "Elo2222" << RESET << std::endl;
+    //            Monitor::ackShop++;
+      //  }
+
 }
 
 void Hunters::sendOrderReq(packet_t packet){
@@ -158,7 +165,9 @@ void Hunters::goToShop(packet_t packet){
 	if(!Monitor::shopAsked){
 		Hunters::askHowMuchInShop(packet);
 	}
+	sleep(1);
 	if(Monitor::inShopCount < MAX_SHOP && Monitor::ackShop == HUNTERS_COUNT - 1){
+		Hunters::state = HuntersState::IN_SHOP;
 		std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
 		sleep(200);
 	}

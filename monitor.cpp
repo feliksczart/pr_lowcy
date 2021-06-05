@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "monitor.h"
+#include "hunters.h"
 
 int Monitor::rank;
 int Monitor::size;
@@ -52,9 +53,27 @@ void Monitor::listen(){
 	packet_t packet;
 	while(Monitor::listening){
 		packet = Monitor::receiveMessage();
-		pthread_mutex_lock(&Monitor::messageQMutex);
-		Monitor::messageQ.push(packet);
-		pthread_mutex_unlock(&Monitor::messageQMutex);
+		if(packet.tag == SHOP_REQ){
+			int target = packet.from;
+                        packet.from = Monitor::rank;
+                        packet.lamport = Monitor::getLamport();
+			if(Hunters::state == HuntersState::IN_SHOP){
+				Monitor::sendMessage(&packet,target,TRUE_IN);
+			} else {
+				Monitor::sendMessage(&packet,target,FALSE_IN);
+			}
+		} else if(packet.tag == TRUE_IN){
+                	std::cout << BLUE << "Elo" << RESET << std::endl;
+                	Monitor::inShopCount++;
+                	Monitor::ackShop++;
+        	} else if(packet.tag == FALSE_IN){
+                	std::cout << BLUE << "Elo2222" << RESET << std::endl;
+                	Monitor::ackShop++;
+        	} else {
+			pthread_mutex_lock(&Monitor::messageQMutex);
+			Monitor::messageQ.push(packet);
+			pthread_mutex_unlock(&Monitor::messageQMutex);
+		}
 	}	
 }
 void Monitor::incrementLamport() {

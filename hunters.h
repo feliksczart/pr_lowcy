@@ -15,7 +15,6 @@ enum class HuntersState{
 
 class Hunters {
 	private:
-		static HuntersState state;
 		static void handleNewMessage(packet_t packet);
 		static void sendOrderReq(packet_t packet);
 		static int getMyLamportInQueue(int orderNum);
@@ -26,6 +25,7 @@ class Hunters {
 		static void askHowMuchInShop(packet_t packet);
 	public:
         	static void loop(int size, int rank);
+		static HuntersState state;
 };
 
 
