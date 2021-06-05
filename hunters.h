@@ -33,6 +33,8 @@ class Hunters {
 		static void sendMissionDone(packet_t packet);
 		static int getMissionPrincipal(int mission);
 		static int wonMissionNum;
+		static bool goShopPrinted;
+		static bool received;
 		static void resetHunters();
 	public:
         	static void loop(int size, int rank);

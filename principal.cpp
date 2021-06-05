@@ -27,9 +27,8 @@ void Principal::loop(int size, int rank){
 		} else{
 			while(Monitor::currentMissions > Monitor::LM){
 				std::cout << RED << Monitor::getLamport() << ": Zleceniodawca " << rank << " nie może wysłać zlecenia, bo za dużo niewykonanych!" << RESET << std::endl;
-				sleep(rand()%20);
-				Monitor::currentMissions-=1;
-				orderId--;
+				sleep(5);
+				Monitor::incrementLamport();
 			}
 			pthread_mutex_unlock(&Monitor::newMissionMutex);
 		} 

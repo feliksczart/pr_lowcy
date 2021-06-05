@@ -5,6 +5,8 @@
 HuntersState Hunters::state = HuntersState::WAITING_ORDER;
 bool Hunters::listenPrincipal = true;
 bool Hunters::waitPrinted = false;
+bool Hunters::goShopPrinted = false;
+bool Hunters::received = false;
 int Hunters::wonMissionNum;
 
 
@@ -14,21 +16,21 @@ void Hunters::loop(int size, int rank){
 	pthread_create(&incomingMissionThread,NULL,&incomingMissionMonitor,NULL);
 	
 	bool missRcv = false;
-	bool goShopPrinted = false;
 	packet_t packet;
 
 	while(1){
 		pthread_mutex_lock(&Monitor::incomingMissionMutex);
 		pthread_mutex_lock(&Monitor::messageQMutex);
-		
 		if(!Monitor::messageQ.empty()){
 			sleep(1);
+			//std::cout << GREEN <<Monitor::onMission.size() << RESET << std::endl;
 			packet = Monitor::messageQ.front();
 			Monitor::messageQ.pop();
 			//std::cout << GREEN << packet.tag << RESET << std::endl;
 			if(packet.tag == NEW_MISSION && Hunters::state != HuntersState::WAITING_SHOP){
 				sleep(rand()%3+1);
 				missRcv = true;
+				Hunters::received = true;
 				Monitor::principal_mission.push_back(std::make_pair(packet.from,packet.orderNumber));	
 				std::cout << GREEN << Monitor::getLamport() << ": Łowca " << rank << " otrzymał wiadomość o dostępnym zleceniu nr " << packet.orderNumber << RESET << std::endl;
 			} else if(packet.tag == ORDER_REQ && Hunters::state != HuntersState::WAITING_SHOP){
@@ -39,14 +41,14 @@ void Hunters::loop(int size, int rank){
 			if(Monitor::onMission.size() < HUNTERS_COUNT-1 && Hunters::checkWinner(packet.from))
 				Hunters::handleNewMessage(packet);
 		}
-
-		if(Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
+		if((Monitor::ackCount + Monitor::onMission.size() == HUNTERS_COUNT && Hunters::received) || ((Monitor::onMission.size() == HUNTERS_COUNT-1 || HUNTERS_COUNT == 1) && missRcv || Hunters::state == HuntersState::WAITING_SHOP)){
 			Hunters::sendAckIGo(packet);
+			//std::cout << GREEN <<Monitor::onMission.size() << RESET << std::endl;
 			Hunters::state = HuntersState::WAITING_SHOP;
 			Hunters::listenPrincipal = false;
-			if(!goShopPrinted)	
+			if(!Hunters::goShopPrinted)	
 				std::cout << BLUE << Monitor::getLamport() << ": Łowca " << rank << " rusza do sklepu" << RESET << std::endl;
-			goShopPrinted = true;
+			Hunters::goShopPrinted = true;
 			sleep(rand()%2);
 			Hunters::goToShop(packet);
 		}
@@ -205,6 +207,7 @@ void Hunters::goToShop(packet_t packet){
 			sleep(30);
 			std::cout << WHITE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wyszedł ze sklepu" << RESET << std::endl;
 			Hunters::sendAckToQueue(packet);
+			Monitor::inShop.erase(std::remove(Monitor::inShop.begin(), Monitor::inShop.end(), Monitor::rank), Monitor::inShop.end());	
 			Hunters::state = HuntersState::ON_MISSION;
 			Monitor::incrementLamport();
 			sleep(5);
@@ -275,7 +278,7 @@ bool Hunters::checkShopWinner(int winner){
 }
 
 void Hunters::goMission(packet_t packet){
-	sleep(rand()%20);
+	sleep(10);
 	Monitor::incrementLamport();
 	std::cout << CYAN << Monitor::getLamport() << ": Łowca " << Monitor::rank << " ukończył misję" << RESET << std::endl;
 	Hunters::sendMissionDone(packet);
@@ -308,5 +311,9 @@ void Hunters::resetHunters(){
 	Hunters::state = HuntersState::WAITING_ORDER;
 	std::queue<packet_t> empty;
 	std::swap(Monitor::messageQ, empty);
+	Hunters::goShopPrinted = false;
+	Hunters::received = false;
+	Monitor::shopAsked = false;
+	//Monitor::ackCount = 0;
 	Monitor::onMission.erase(std::remove(Monitor::onMission.begin(), Monitor::onMission.end(), Monitor::rank), Monitor::onMission.end());
 }

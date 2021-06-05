@@ -5,7 +5,7 @@
 int Monitor::rank;
 int Monitor::size;
 
-int Monitor::HM = 5;
+int Monitor::HM = 3;
 int Monitor::LM = 3;
 int Monitor::currentMissions = 0;
 unsigned int Monitor::lamport = 0;
