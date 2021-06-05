@@ -53,7 +53,7 @@ void Monitor::listen(){
 	packet_t packet;
 	while(Monitor::listening){
 		packet = Monitor::receiveMessage();
-		if(packet.tag == SHOP_REQ){
+		if(packet.tag == SHOP_REQ && Hunters::state != HuntersState::ON_MISSION){
 			int target = packet.from;
 			Monitor::shop_q.push_back(std::make_pair(packet.lamport,target));
                         packet.from = Monitor::rank;
@@ -68,7 +68,11 @@ void Monitor::listen(){
 			Monitor::shop_q.push_back(std::make_pair(packet.lamport,packet.from));
         	} else if(packet.tag == FALSE){
                 	Monitor::ackShop++;
-        	} else {
+        	} else if(packet.tag == OUT){
+                        if(Monitor::shop_q.size()>0)
+                                Monitor::shop_q.erase(Monitor::shop_q.begin());
+                        Monitor::ackShop++;
+                } else {
 			pthread_mutex_lock(&Monitor::messageQMutex);
 			Monitor::messageQ.push(packet);
 			pthread_mutex_unlock(&Monitor::messageQMutex);

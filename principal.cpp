@@ -12,7 +12,10 @@ void Principal::loop(int size, int rank){
 	
 	//wysyłanie zleceń
 	while(1){
-		sleep(rand()%40);	
+		if (rank == 0)
+			sleep(rand()%40);
+		else
+			sleep(rand()%100);	
 		pthread_mutex_lock(&Monitor::newMissionMutex);
 
         	pthread_mutex_lock(&Monitor::missionsMutex);

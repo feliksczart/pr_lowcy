@@ -159,20 +159,24 @@ void Hunters::goToShop(packet_t packet){
 		Monitor::shop_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
 	}
 	sleep(1);
+	std::cout << WHITE << Monitor::rank << "::" << Monitor::ackShop << RESET << std::endl;
 	if(Monitor::ackShop == HUNTERS_COUNT - 1){
 		if(Monitor::shop_q.size()>1)
 			std::sort(Monitor::shop_q.begin(),Monitor::shop_q.end(),Monitor::myComparison);
 		int winner = Monitor::shop_q.at(0).second;
+		std::cout << YELLOW << winner << RESET << std::endl;
 		if(Monitor::rank == winner){
 			Monitor::shop_q.erase(Monitor::shop_q.begin());
 			Hunters::state = HuntersState::IN_SHOP;
 			std::cout << BLUE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wszedł do sklepu" << RESET << std::endl;
+			Monitor::incrementLamport();
 			sleep(10);
+			std::cout << WHITE << Monitor::getLamport() << ": Łowca " << Monitor::rank << " wyszedł ze sklepu" << RESET << std::endl;
 			Hunters::sendAckToQueue(packet);
+			Hunters::state = HuntersState::ON_MISSION;
 			sleep(200);	
 		} else {
 			Monitor::ackShop--;
-			Monitor::shop_q.erase(Monitor::shop_q.begin());
 		}
 	}
 }
@@ -199,7 +203,7 @@ void Hunters::sendAckToQueue(packet_t packet){
         packet.from = Monitor::rank;
         for(int i = 0; i < siz; i++){
                 if(i%4!=0 && i != Monitor::rank){
-                        Monitor::sendMessage(&packet,i,FALSE);
+                        Monitor::sendMessage(&packet,i,OUT);
                 }
         }
         Monitor::incrementLamport();

@@ -22,6 +22,7 @@ using namespace std;
 #define SHOP_REQ 103
 #define TRUE 104
 #define FALSE 105
+#define OUT 106
 #define MISSION_FINISHED 200
 #define WAIT_HUNTERS 2
 #define MAX_SHOP 1
