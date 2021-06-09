@@ -178,7 +178,7 @@ void Hunters::sendAckIGo(packet_t packet){
 
 void Hunters::goToShop(packet_t packet){
 	if(!Monitor::shopAsked){
-		Hunters::askHowMuchInShop(packet);
+		Hunters::askHowMuchInQShop(packet);
 		Monitor::shop_q.push_back(std::make_pair(Monitor::getLamport(),Monitor::rank));
 	}
 	sleep(1);
@@ -226,7 +226,7 @@ void Hunters::goToShop(packet_t packet){
 	}
 }
 
-void Hunters::askHowMuchInShop(packet_t packet){
+void Hunters::askHowMuchInQShop(packet_t packet){
 	int siz;
         MPI_Comm_size(MPI_COMM_WORLD,&siz);
         packet.lamport = Monitor::getLamport();

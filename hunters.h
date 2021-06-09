@@ -22,7 +22,7 @@ class Hunters {
 		static bool checkWinner(int winner);
 		static bool canGoMission(int rank);
 		static void goToShop(packet_t packet);
-		static void askHowMuchInShop(packet_t packet);
+		static void askHowMuchInQShop(packet_t packet);
 		static bool canGoShop(int rank);
 		static void sendAckToQueue(packet_t packet);
 		static void sendAckInShop(packet_t packet);
